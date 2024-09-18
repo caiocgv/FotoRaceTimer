@@ -73,8 +73,6 @@ void Mostrarelogio()
     starmil = millis()  ;
   }
   endmil = millis() - starmil;
-  /*endmil=endmil/15;
-  endmil=endmil*15;*/
 
   Wire.beginTransmission(DS1307_ADDRESS);
   Wire.write(zero);
@@ -84,7 +82,7 @@ void Mostrarelogio()
   int minutos = ConverteparaDecimal(Wire.read());
   int horas = ConverteparaDecimal(Wire.read());
 
-  // Imprime mensagem na primeira linha do display
+  // Imprime mensagem no serial
   Serial.print(horas);
   Serial.print(":");
   Serial.print(minutos);
