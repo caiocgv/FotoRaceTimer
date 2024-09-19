@@ -175,7 +175,7 @@ void loop() {
         // then write the ID     
         myFile.println(message);
         myFile.close();
-        Serial.println("Passagem computada com sucesso!");
+        Serial.println("Passagem computada com sucesso! Sistema pronto para nova passagem.");
       }
       message_pos = 0;
     }
