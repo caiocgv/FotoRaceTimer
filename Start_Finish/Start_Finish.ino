@@ -30,11 +30,10 @@ byte ConverteparaDecimal(byte val)
 void recalibrar() {
   sensorValue = 0;
   for (i = 0; i < 10; i++) {
-    //Serial.println(analogRead(sensorPin));
     sensorValue = sensorValue + analogRead(sensorPin);
   }
   sensorValue = sensorValue / 10 - 50;
-  //Serial.println(sensorValue);
+  
   i = 0;
 }
 
@@ -76,34 +75,25 @@ void setup() {
     Serial.println("initialization failed!");
     while (1);
   }
-  myFile = SD.open("test.txt", FILE_WRITE);
-  //  if (myFile) {
-  //    Serial.println("Writing to test.txt...");
-  // myFile.println("STARTING THE SYSTEM");
-  //    // close the file:
+
+  myFile = SD.open("test.txt", FILE_WRITE); // Abre o arquivo para escrita, cria o arquivo se ele não for existente
   myFile.close();
-  //    Serial.println("done.");
-  //  } else {
-  //    // if the file didn't open, print an error:
-  //    Serial.println("error opening test.txt");
-  //  }
+
   recalibrar();
   Serial.println("SYSTEM READY!");
 }
 
 void loop() {
-  // delay(5);
   Wire.beginTransmission(DS1307_ADDRESS);
   Wire.write(zero);
   Wire.endTransmission();
   Wire.requestFrom(DS1307_ADDRESS, 1);
   endmil = ConverteparaDecimal(Wire.read());
+
   if ( segundos != endmil) {
     starmil = millis()  ;
   }
   endmil = millis() - starmil;
-  /*endmil = endmil / 15;
-    endmil = endmil * 15;*/
 
   Wire.beginTransmission(DS1307_ADDRESS);
   Wire.write(zero);
@@ -119,15 +109,7 @@ void loop() {
 
       i = 0;
       digitalWrite(10, LOW);
-      myFile = SD.open("test.txt", FILE_WRITE);
-      myFile.print(horas);
-      myFile.print(":");
-      myFile.print(minutos);
-      myFile.print(":");
-      myFile.print(segundos);
-      myFile.print(":");
-      myFile.println(endmil, 0);
-      myFile.close();
+      
       Serial.print(horas);
       Serial.print(":");
       Serial.print(minutos);
@@ -137,8 +119,8 @@ void loop() {
       Serial.println(endmil, 0);
 
       //escolha o delay necessário de acordo com a aplicação. (largada ou chegada)
-      //delay(500);
-      delay(5000);
+      //delay(500); // chegada
+      delay(5000); // largada
       recalibrar();
     }
   }
@@ -172,15 +154,25 @@ void loop() {
       Serial.println(message);
 
       String msg = message;
-      //Serial.println(msg);
-      if (msg == "Read") {
+      msg.toLowerCase();
+    
+      if (msg == "read") {
         Read();
       }
-      else if (msg == "Delete") {
+      else if (msg == "delete") {
         Delete();
       }
       else {
         myFile = SD.open("test.txt", FILE_WRITE);
+        // write time first on file
+        myFile.print(horas);
+        myFile.print(":");
+        myFile.print(minutos);
+        myFile.print(":");
+        myFile.print(segundos);
+        myFile.print(":");
+        myFile.println(endmil, 0);
+        // then write the ID     
         myFile.println(message);
         myFile.close();
         Serial.println("Passagem computada com sucesso!");
