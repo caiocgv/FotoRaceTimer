@@ -3,10 +3,6 @@
 Foto Race timer is a millisecond precision timer based on two RTC modules sycronized that will measure the time between an start and a finish.
 ## Hardware
 Arduino based, will be improved to esp8266 for wifi capability and later to esp32 LoRa for radio com between modules.
-LDR for passage detection
-LED for status and feeding LDR
-SD card module for data storage (will be removed when ESP modules are implemented)
-RTC module for time keeping
 ## Software
 Arduino software is pretty straight forward with few commands that the user can iterate
 #### Delete
