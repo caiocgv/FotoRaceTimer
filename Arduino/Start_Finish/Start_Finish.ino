@@ -44,8 +44,10 @@ void recalibrar() {
 void Read() {
   myFile = SD.open("test.txt");
   if (myFile) {
+    delay(10);
     Serial.println("READING FILE test.txt:");
     while (myFile.available()) {
+      delay(20);
       Serial.write(myFile.read());
     }
     myFile.close();
@@ -59,6 +61,7 @@ void Delete() {
   if (myFile) {
     Serial.println("READING FILE test.txt:");
     while (myFile.available()) {
+      delay(20);
       Serial.write(myFile.read());
     }
     Serial.println(" ");
