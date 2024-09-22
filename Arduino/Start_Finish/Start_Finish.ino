@@ -59,6 +59,7 @@ void Read() {
 void Delete() {
   myFile = SD.open("test.txt");
   if (myFile) {
+    delay(10);
     Serial.println("READING FILE test.txt:");
     while (myFile.available()) {
       delay(20);
