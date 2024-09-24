@@ -10,27 +10,30 @@
         <button type="button" onclick="document.getElementById('files').click()">Choose file</button>
         <input style="display: none;" id="files" type='file' multiple accept='.yaml, .txt' name='file' onchange="form.submit()">
     </form>
-    <h1>Current Athletes</h1>
-    <table>
-        <tr>
-            <th>Category</th>
-            <th>Name</th>
-            <th>Number</th>
-            <th>Start</th>
-            <th>Finish</th>
-            <th>Time</th>
-        </tr>
-        {% for athlete in Athletes %}
-        <tr>
-            <td>{{ athlete.category }}</td>
-            <td>{{ athlete.name     }}</td>
-            <td>{{ athlete.number   }}</td>
-            <td>{{ athlete.start    }}</td>
-            <td>{{ athlete.finish   }}</td>
-            <td>{{ athlete.time     }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    {% if Athletes %}
+        <h1>Current Athletes</h1>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Name</th>
+                <th>Number</th>
+                <th>Start</th>
+                <th>Finish</th>
+                <th>Time</th>
+            </tr>
+            {% for athlete in Athletes %}
+            <tr>
+                <td>{{ athlete.category }}</td>
+                <td>{{ athlete.name     }}</td>
+                <td>{{ athlete.number   }}</td>
+                <td>{{ athlete.start    }}</td>
+                <td>{{ athlete.finish   }}</td>
+                <td>{{ athlete.time     }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    
+
     <div>
         <form action="/clear">
             <input type="submit" value="Clear Athletes">
@@ -39,8 +42,9 @@
             <input type="submit" value="Save Athletes">
         </form>
     </div>
+    {% endif %}
     <hr>
-
+    
     <h1>Register New Athlete</h1>
     <form action="/" method="POST">
         <select id="category" name="info">
