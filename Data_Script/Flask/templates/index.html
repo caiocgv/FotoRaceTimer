@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Race Sheet</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Import Data</h1>
+    <form action="/import" method="POST" enctype="multipart/form-data">
+        <button type="button" onclick="document.getElementById('files').click()">Choose file</button>
+        <input style="display: none;" id="files" type='file' multiple accept='.yaml, .txt' name='file' onchange="form.submit()">
+    </form>
+    <h1>Current Athletes</h1>
+    <table>
+        <tr>
+            <th>Category</th>
+            <th>Name</th>
+            <th>Number</th>
+            <th>Start</th>
+            <th>Finish</th>
+            <th>Time</th>
+        </tr>
+        {% for athlete in Athletes %}
+        <tr>
+            <td>{{ athlete.category }}</td>
+            <td>{{ athlete.name     }}</td>
+            <td>{{ athlete.number   }}</td>
+            <td>{{ athlete.start    }}</td>
+            <td>{{ athlete.finish   }}</td>
+            <td>{{ athlete.time     }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <form action="/clear">
+            <input type="submit" value="Clear Athletes">
+        </form>
+        <form action="/save">
+            <input type="submit" value="Save Athletes">
+        </form>
+    </div>
+    <hr>
+
+    <h1>Register New Athlete</h1>
+    <form action="/" method="POST">
+        <select id="category" name="info">
+            <option value="Sub 30">Sub 30</option>
+            <option value="Master A">Master A</option>
+            <option value="Master B">Master B</option>
+            <option value="E-Bike">E-Bike</option>
+        </select>
+        <input type="text" id="name" name="info" placeholder="Name">
+        <input type="number" id="number" name="info" placeholder="Number">
+        
+        <input type="submit" value="Submit">
+    </form>
+    
+</body>
+</html>

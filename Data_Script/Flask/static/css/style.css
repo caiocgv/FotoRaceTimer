@@ -1,0 +1,83 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: rgb(193, 217, 238);
+}
+div {
+    margin: 10px;
+    display: flex;  
+    width: 20%;
+    justify-content: space-evenly;
+}
+
+/* Style tables */
+table {
+    width: 100%;
+}
+
+table th {
+    padding: 10px;
+    border: 1px solid #555;
+    background-color: #555;
+    color: aliceblue;
+    border-radius: 4px;
+}
+
+table td {
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+table tr:nth-child(odd) td {
+    background-color: lightgray;
+}
+
+table tr:nth-child(even) td {
+    background-color: white;
+}
+
+/* Style input fields */
+select,
+input[type="text"],
+input[type="number"],
+input[type="email"] {
+    width: 10%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+/* Style buttons */
+input[type="submit"],
+button{
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #555;
+    color: aliceblue;
+    margin: 10px;
+}
+
+input[type="submit"]:hover {
+    background-color: white;
+    color: #555;
+}
+
+/* Add animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Apply animation to elements */
+table,
+input {
+    animation: fadeIn 0.5s ease-in-out;
+}
