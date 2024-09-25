@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Race Sheet</title>
+    <title>{{title|default("Race Sheet")}}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Import Data</h1>
+    <h1>Importar Arquivos</h1>
     <form action="/import" method="POST" enctype="multipart/form-data">
-        <button type="button" onclick="document.getElementById('files').click()">Choose file</button>
-        <input style="display: none;" id="files" type='file' multiple accept='.yaml, .txt' name='file' onchange="form.submit()">
+        <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
+        <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' onchange="form.submit()">
     </form>
     {% if Athletes %}
-        <h1>Current Athletes</h1>
+        <h1>Atletas Inscritos</h1>
         <table>
             <tr>
-                <th>Category</th>
-                <th>Name</th>
-                <th>Number</th>
-                <th>Start</th>
-                <th>Finish</th>
-                <th>Time</th>
+                <th>Categoria</th>
+                <th>Nome</th>
+                <th>Número</th>
+                <th>Largada</th>
+                <th>Chegada</th>
+                <th>Tempo</th>
             </tr>
             {% for athlete in Athletes %}
             <tr>
@@ -36,16 +37,19 @@
 
     <div>
         <form action="/clear">
-            <input type="submit" value="Clear Athletes">
+            <input type="submit" value="Excluir todos os Atletas">
         </form>
         <form action="/save">
-            <input type="submit" value="Save Athletes">
+            <input type="submit" value="Salvar Novos Atletas">
+        </form>        
+        <form action="/export">
+            <input type="submit" value="Exportar lista de atletas">
         </form>
     </div>
     {% endif %}
     <hr>
     
-    <h1>Register New Athlete</h1>
+    <h1>Registrar Novo Atleta</h1>
     <form action="/" method="POST">
         <select id="category" name="info">
             <option value="Sub 30">Sub 30</option>
@@ -53,10 +57,10 @@
             <option value="Master B">Master B</option>
             <option value="E-Bike">E-Bike</option>
         </select>
-        <input type="text" id="name" name="info" placeholder="Name">
-        <input type="number" id="number" name="info" placeholder="Number">
+        <input type="text" id="name" name="info" placeholder="Nome" required>
+        <input type="number" id="number" name="info" placeholder="Número">
         
-        <input type="submit" value="Submit">
+        <input type="submit" value="Enviar">
     </form>
     
 </body>
