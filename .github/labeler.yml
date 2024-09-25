@@ -2,7 +2,7 @@
 critical:
     - '(critical|urgent)'
 enhancement:
-    - '(create|improve|include|generate)'
+    - '(create|improve|include|generate|implement)'
 bug:
     - '(not working|not showing|issue|bug)'
 documentation:
