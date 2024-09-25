@@ -1,0 +1,44 @@
+name: Deploy to PythonAnywhere
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Specify the Python version you need
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask gunicorn
+
+    - name: Upload code to PythonAnywhere
+      env:
+        USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+        API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
+      run: |
+        ZIP_FILE="deploy.zip"
+        zip -r $ZIP_FILE . -x "*.git*"
+        curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/files/path/home/$USERNAME/$ZIP_FILE" \
+          -H "Authorization: Token $API_TOKEN" \
+          --form "content=@$ZIP_FILE"
+
+    - name: Unzip and deploy on PythonAnywhere
+      env:
+        USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+        API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
+      run: |
+        curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/consoles/" \
+          -H "Authorization: Token $API_TOKEN" \
+          --data "command=bash -c 'unzip -o ~/deploy.zip -d ~/ && rm ~/deploy.zip && cd ~/ && pip install -r requirements.txt && python main.py'"
