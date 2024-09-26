@@ -1,4 +1,17 @@
 from time_class import Time
+"""
+Represents a racer in a race.
+Attributes:
+    category (str): The category of the racer.
+    name (str): The name of the racer.
+    number (int): The number of the racer.
+    start (Time): The start time of the racer.
+    finish (Time): The finish time of the racer.
+    time (Time): The total time taken by the racer.
+Methods:
+    to_dict(): Converts the racer object to a dictionary.
+    calculate_time(): Calculates the total time taken by the racer.
+"""
 
 class racer:
     def __init__(self, data):

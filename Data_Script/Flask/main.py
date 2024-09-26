@@ -45,6 +45,15 @@ def download():
 
 @app.route('/import', methods=['POST'])
 def upload():
+    """
+    Uploads a file and processes its contents to update the `Athletes` list.
+    Returns:
+        A rendered template of the `index.html` page with the updated `Athletes` list.
+    Raises:
+        ValueError: If the file name is invalid.
+        ValueError: If the file type is invalid.
+    """
+    
     global Athletes
     file = request.files.get('file')
     

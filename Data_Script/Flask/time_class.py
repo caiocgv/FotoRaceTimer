@@ -1,4 +1,19 @@
 class Time:
+    """
+    Represents a time in hours, minutes, seconds, and milliseconds.
+    Args:
+        time_str (str): A string representing the time in the format "hour:minute:second:millis".
+    Attributes:
+        hour (int): The hour component of the time.
+        minute (int): The minute component of the time.
+        second (int): The second component of the time.
+        millis (int): The millisecond component of the time.
+    Methods:
+        __str__(): Returns a string representation of the time in the format "hour:minute:second:millis".
+        diff(other): Calculates the difference between two Time objects and returns a new Time object representing the difference.
+        sum_up(other): Calculates the sum of two Time objects and returns a new Time object representing the sum.
+    """
+
     def __init__(self, time_str):
         if time_str == None:
             self.hour = 0
