@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, send_file
 import yaml
 from Athlete_Class import racer
+from time_class import Time
 
 app = Flask(__name__)
 Athletes = []
@@ -56,7 +57,25 @@ def upload():
     elif file.filename.rsplit('.',1)[1].lower() == 'txt':
         string = file.read().decode('utf-8')
         data = string.split('\r')
-        print(data)
+
+        for i in range(len(data)):            
+            if ":" in data[i]:
+                if file.filename.rsplit('.',1)[0].lower() in ['largada','chegada']:
+                    for racers in Athletes:
+                        if str(racers.number) == data[i+1]:
+                            if file.filename.rsplit('.',1)[0].lower() == 'largada':
+                                racers.start = Time(data[i])
+                            elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                racers.finish = Time(data[i])
+                            else:
+                                pass
+                            if racers.start != None and racers.finish != None:
+                                racers.calculate_time()
+                            break
+                else:
+                    return render_template('error.html', error='Invalid file name')
+    else:
+        return render_template('error.html', error='Invalid file type')
 
     return render_template('index.html', Athletes=Athletes)
 
