@@ -56,6 +56,14 @@ def upload():
     
     global Athletes
     file = request.files.get('file')
+    flag = request.form.get('flag')
+    if flag == 'true':
+        # multi stage race, some variables should be declared as lists to store all data
+        for racers in Athletes:
+            racers.stage = [] if isinstance(racers.stage, list) == False else racers.stage
+            racers.start = [] if isinstance(racers.start, list) == False else racers.start
+            racers.finish = [] if isinstance(racers.finish, list) == False else racers.finish
+            racers.time = [] if isinstance(racers.time, list) == False else racers.time
     
     if file.filename.rsplit('.',1)[1].lower() == 'yaml':
         file.save('athletes.yaml')
@@ -71,22 +79,35 @@ def upload():
             if ":" in data[i]:
                 if file.filename.rsplit('.',1)[0].lower() in ['largada','chegada']:
                     for racers in Athletes:
-                        if str(racers.number) == data[i+1]:
-                            if file.filename.rsplit('.',1)[0].lower() == 'largada':
-                                racers.start = Time(data[i])
-                            elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
-                                racers.finish = Time(data[i])
-                            else:
-                                pass
-                            if racers.start != None and racers.finish != None:
+                        if flag != 'true': 
+                            # single stage race, look for the matching number, get the time, break the loop
+                            if str(racers.number) == str(data[i+1]):
+                                if file.filename.rsplit('.',1)[0].lower() == 'largada':
+                                    racers.start = Time(data[i])
+        
+                                elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                    racers.finish = Time(data[i])
+
                                 racers.calculate_time()
-                            break
+                                break
+
+                        else:
+                            # multi stage race, look for all the matching numbers where the last digit is always the special number
+                            if str(racers.number) == str(data[i+1])[:-1]:
+                                racers.stage.append(data[i+1][-1:]) # store the special number
+
+                                if file.filename.rsplit('.',1)[0].lower() == 'largada':
+                                    racers.start.append(Time(data[i]))
+                                elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                    racers.finish.append(Time(data[i]))
+                                
+                                racers.calculate_time()
                 else:
                     return render_template('error.html', error='Invalid file name')
     else:
         return render_template('error.html', error='Invalid file type')
 
-    return render_template('index.html', Athletes=Athletes)
+    return render_template('index.html', Athletes=Athletes, flag=flag)
 
 if __name__ == '__main__':
     app.run(debug=True) 
