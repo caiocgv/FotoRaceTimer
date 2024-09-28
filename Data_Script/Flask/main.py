@@ -4,15 +4,6 @@ from Athlete_Class import racer
 from time_class import Time
 
 app = Flask(__name__)
-Athletes = []
-try:
-    with open('athletes.yaml', 'r') as file:
-        existing_data = yaml.load(file, Loader=yaml.FullLoader)
-
-    for data in existing_data:
-        Athletes.append(racer(data))
-except:
-    pass
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -21,6 +12,16 @@ def main():
         Athletes.append(racer(request.form.getlist('info'))) if request.form.getlist('info')[1] != "" else None
         return render_template('index.html', Athletes=Athletes)
     else:
+        Athletes = []
+        try:
+            with open('athletes.yaml', 'r') as file:
+                existing_data = yaml.load(file, Loader=yaml.FullLoader)
+
+            for data in existing_data:
+                Athletes.append(racer(data))
+        except:
+            pass
+
         return render_template('index.html', Athletes=Athletes)
 
 @app.route('/clear')
@@ -55,6 +56,8 @@ def upload():
     """
     
     global Athletes
+    max_stage = 0 # variable to store the max number of stages
+
     file = request.files.get('file')
     flag = request.form.get('flag')
     if flag == 'true':
@@ -113,10 +116,25 @@ def upload():
                                 
                                 racers.calculate_time()
 
+
+                                # check the max number of stages                                
+                                for racers in Athletes:
+                                    max_stage = max(len(racers.stage), max_stage)
+                                    
+                                # fill the missing stages with empty data
+                                for racers in Athletes:
+                                    if len(racers.stage) < max_stage:
+                                        for i in range(max_stage - len(racers.stage)):
+                                            if str(i+1) not in racers.stage:
+                                                racers.stage.append(str(i+1))
+                                                racers.start.append(Time(None))
+                                                racers.finish.append(Time(None))
+                                                racers.time.append(Time(None))
+
                                 # check if racers.time has at least one valid time
                                 if len(racers.time) > 0:
                                     racers.totTime = [Time(None) for time in racers.time]
-                                    print (racers.totTime)
+
                                     for i in range(len(racers.time)):
                                         if i == 0:
                                             racers.totTime[i] = racers.time[i]

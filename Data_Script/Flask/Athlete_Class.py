@@ -52,6 +52,8 @@ class racer:
                 for i in range(len(self.start)):
                     if str(self.start[i]).split(':')[0] != '00' and str(self.finish[i]).split(':')[0] != '00':
                         self.time.append(self.finish[i].diff(self.start[i]))
+                    else:
+                        self.time.append(Time('00:10:00:000'))
             except:
                 pass
         else:
