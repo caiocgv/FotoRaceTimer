@@ -10,10 +10,12 @@
     <form action="/import" method="POST" enctype="multipart/form-data">
         <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
         <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' onchange="form.submit()">
-        
-        <input type="checkbox" id="flag" name="flag" value="true">
-        <label for="flag">Multi Stage Race</label>
-
+        {% if flag == 'true' %}
+            <input type="checkbox" id="flag" name="flag" value="true" checked style="display: none;">
+        {% else %}
+            <input type="checkbox" id="flag" name="flag" value="true">
+            <label for="flag">Multi Stage Race</label>
+        {% endif %}
     </form>
     {% if flag == 'true' %}
         {% if Athletes %}
