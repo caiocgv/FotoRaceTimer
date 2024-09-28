@@ -60,7 +60,7 @@ class Time:
         millis = diff % 1000
         return Time(f'{hour}:{minute}:{second}:{millis}')
     
-    def sum_up(self, other):
+    def add(self, other):
         self_millis = self.hour*3600000 + self.minute*60000 + self.second*1000 + self.millis
         other_millis = other.hour*3600000 + other.minute*60000 + other.second*1000 + other.millis
         sum_up = self_millis + other_millis

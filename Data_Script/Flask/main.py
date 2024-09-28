@@ -70,7 +70,7 @@ def upload():
         with open('athletes.yaml', 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
         Athletes = [racer(data) for data in existing_data]
-
+        return render_template('index.html', Athletes=Athletes)
     elif file.filename.rsplit('.',1)[1].lower() == 'txt':
         string = file.read().decode('utf-8')
         data = string.split('\r')
@@ -78,6 +78,10 @@ def upload():
         for i in range(len(data)):            
             if ":" in data[i]:
                 if file.filename.rsplit('.',1)[0].lower() in ['largada','chegada']:
+
+                    if len(Athletes) == 0: # check if there are athletes registered
+                        return render_template('error.html', error='No athletes registered')
+                    
                     for racers in Athletes:
                         if flag != 'true': 
                             # single stage race, look for the matching number, get the time, break the loop
@@ -108,6 +112,16 @@ def upload():
                                         racers.finish[racers.stage.index(data[i+1][-1:])] = Time(data[i])   # find the index of the stage and update the finish time                                
                                 
                                 racers.calculate_time()
+
+                                # check if racers.time has at least one valid time
+                                if len(racers.time) > 0:
+                                    racers.totTime = [Time(None) for time in racers.time]
+                                    print (racers.totTime)
+                                    for i in range(len(racers.time)):
+                                        if i == 0:
+                                            racers.totTime[i] = racers.time[i]
+                                        else:
+                                            racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
                 else:
                     return render_template('error.html', error='Invalid file name')
     else:
