@@ -91,15 +91,21 @@ def upload():
                                 racers.calculate_time()
                                 break
 
-                        else:
-                            # multi stage race, look for all the matching numbers where the last digit is always the special number
+                        else:   # multi stage race, look for all the matching numbers where the last digit is always the stage number
                             if str(racers.number) == str(data[i+1])[:-1]:
-                                racers.stage.append(data[i+1][-1:]) # store the special number
-
-                                if file.filename.rsplit('.',1)[0].lower() == 'largada':
-                                    racers.start.append(Time(data[i]))
-                                elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
-                                    racers.finish.append(Time(data[i]))
+                                if data[i+1][-1:] not in racers.stage:  # check if the stage is already in the list
+                                    racers.stage.append(data[i+1][-1:]) # if not, add it with the start and finish time
+                                    if file.filename.rsplit('.',1)[0].lower() == 'largada':
+                                        racers.start.append(Time(data[i]))
+                                        racers.finish.append(Time(None))
+                                    elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                        racers.start.append(Time(None))
+                                        racers.finish.append(Time(data[i]))
+                                else: # if the stage is already in the list, update the start or finish time
+                                    if file.filename.rsplit('.',1)[0].lower() == 'largada':
+                                        racers.start[racers.stage.index(data[i+1][-1:])] = Time(data[i])    # find the index of the stage and update the start time
+                                    elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                        racers.finish[racers.stage.index(data[i+1][-1:])] = Time(data[i])   # find the index of the stage and update the finish time                                
                                 
                                 racers.calculate_time()
                 else:
