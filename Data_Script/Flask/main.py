@@ -60,6 +60,7 @@ def upload():
 
     file = request.files.get('file')
     flag = request.form.get('flag')
+
     if flag == 'true':
         # multi stage race, some variables should be declared as lists to store all data
         for racers in Athletes:
@@ -132,14 +133,14 @@ def upload():
                                                 racers.time.append(Time(None))
 
                                 # check if racers.time has at least one valid time
-                                if len(racers.time) > 0:
-                                    racers.totTime = [Time(None) for time in racers.time]
+                                    if len(racers.time) > 0:
+                                        racers.totTime = [Time(None) for time in racers.time]
 
-                                    for i in range(len(racers.time)):
-                                        if i == 0:
-                                            racers.totTime[i] = racers.time[i]
-                                        else:
-                                            racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
+                                        for i in range(len(racers.time)):
+                                            if i == 0:
+                                                racers.totTime[i] = racers.time[i]
+                                            else:
+                                                racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
                 else:
                     return render_template('error.html', error='Invalid file name')
     else:
