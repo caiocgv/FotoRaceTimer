@@ -2,8 +2,8 @@
 critical:
     - '(critical|urgent)'
 enhancement:
-    - '(create|improve|include|generate|implement|should)'
+    - '(Create|Improve|Include|generate|Implement|should)'
 bug:
-    - '(not working|not showing|issue|bug|error|shouldnt)'
+    - '(not working|not showing|issue|bug|error|shouldn)'
 documentation:
     - '(schematic|folder|documentation)'
