@@ -4,6 +4,6 @@ critical:
 enhancement:
     - '(create|improve|include|generate|implement|should)'
 bug:
-    - '(not working|not showing|issue|bug|error|shouldn't)'
+    - '(not working|not showing|issue|bug|error|shouldnt)'
 documentation:
     - '(schematic|folder|documentation)'
