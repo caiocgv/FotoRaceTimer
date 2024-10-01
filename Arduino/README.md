@@ -18,7 +18,7 @@ Read all stored data
 After every passage an ID (unique number or name) should be input in order for the time to be stored.
 ## Data Processing
 #### Data handling 
-Specific Apps for Android should be installed to register athlete IDs and Read/delete data.
+Specific Apps for Android should be installed to register athlete IDs and Read/delete data. OTG cable needed.
 * [Serial Bluetooth](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal) write only
 * [Serial USB](https://play.google.com/store/apps/details?id=de.kai_morich.serial_usb_terminal) write only
 * [Arduino Droid](https://play.google.com/store/apps/details?id=name.antonsmirnov.android.arduinodroid2) write/read/delete
