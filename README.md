@@ -6,7 +6,7 @@
 #### Printer
 * Recommended to use a printer to present results
 * Using POS series printers is recomended due to mobility
-* Recommended apps for printing results from mobile:
+#### Recommended apps
 * [Android App](https://play.google.com/store/apps/details?id=com.phucynwa.mini.portable.bluetooth.pos.printer) 
 
 * [IOS App](https://apps.apple.com/br/app/bluetooth-thermal-printer/id1599863946)
