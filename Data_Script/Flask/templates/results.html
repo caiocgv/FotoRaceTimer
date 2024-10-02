@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title|default("Race Sheet")}}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Athletes Results</h1>
+    <table>
+        <tr>
+            <th>Categoria</th>
+            <th>Nome</th>
+            <th style="width: 40px;">N°</th>
+            <th>Tempo Total</th>
+        </tr>
+        {% for athlete in Athletes %}
+        <tr>
+            <td>{{ athlete.category     }}</td>
+            <td>{{ athlete.name         }}</td>
+            <td>{{ athlete.number       }}</td>
+            <td>{{ athlete.totTime[-1]  }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

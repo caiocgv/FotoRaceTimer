@@ -56,7 +56,7 @@ def upload():
     """
 
     
-    global Athletes
+    global Athletes, flag
     max_stage = 0
 
     file = request.files.get('file')
@@ -132,28 +132,29 @@ def upload():
                                         else:
                                             racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
 
-                    # check the max number of stages                                
-                    for i in range(len(Athletes)):
-                        if len(Athletes[i].stage) > len(Athletes[max_stage].stage):
-                            max_stage = i
-                                
-                    for stage in Athletes[max_stage].stage:
-                        for racers in Athletes:
-                            if stage not in racers.stage:
-                                racers.stage.append(stage)
-                                racers.start.append(Time(None))
-                                racers.finish.append(Time(None))
-                                racers.time.append(Time('00:10:00:000'))
+                    # check the max number of stages
+                    if flag == 'true':                                
+                        for i in range(len(Athletes)):
+                            if len(Athletes[i].stage) > len(Athletes[max_stage].stage):
+                                max_stage = i
+                                    
+                        for stage in Athletes[max_stage].stage:
+                            for racers in Athletes:
+                                if stage not in racers.stage:
+                                    racers.stage.append(stage)
+                                    racers.start.append(Time(None))
+                                    racers.finish.append(Time(None))
+                                    racers.time.append(Time('00:10:00:000'))
 
-                            # check if racers.time has at least one valid time and fill the totTime list
-                            if len(racers.time) > 0:
-                                racers.totTime = [Time(None) for time in racers.time]
+                                # check if racers.time has at least one valid time and fill the totTime list
+                                if len(racers.time) > 0:
+                                    racers.totTime = [Time(None) for time in racers.time]
 
-                            for i in range(len(racers.time)): # calculate the total time
-                                if i == 0:
-                                    racers.totTime[i] = racers.time[i]
-                                else:
-                                    racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
+                                for i in range(len(racers.time)): # calculate the total time
+                                    if i == 0:
+                                        racers.totTime[i] = racers.time[i]
+                                    else:
+                                        racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
 
                 else:
                     return render_template('error.html', error='Invalid file name')
@@ -161,6 +162,20 @@ def upload():
         return render_template('error.html', error='Invalid file type')
 
     return render_template('index.html', Athletes=Athletes, flag=flag)
+
+
+@app.route('/results', methods=['GET', 'POST']) 
+def results(): 
+    global Athletes
+    if request.method == 'POST':
+        pass
+    else:
+        if flag == 'true':
+            Athletes.sort(key=lambda x: x.totTime[-1].compare())
+        else:
+            Athletes.sort(key=lambda x: x.time.compare())
+
+    return render_template('results.html', Athletes=Athletes)
 
 if __name__ == '__main__':
     app.run(debug=True) 

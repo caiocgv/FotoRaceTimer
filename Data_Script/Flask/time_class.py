@@ -71,3 +71,7 @@ class Time:
         second = sum_up // 1000
         millis = sum_up % 1000
         return Time(f'{hour}:{minute}:{second}:{millis}')
+    
+    def compare(self):
+        self_millis = self.hour*3600000 + self.minute*60000 + self.second*1000 + self.millis
+        return self_millis

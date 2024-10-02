@@ -8,7 +8,7 @@
 div {
     margin: 10px;
     display: flex;  
-    width: 20%;
+    width: 40%;
     justify-content: space-evenly;
 }
 
