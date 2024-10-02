@@ -110,10 +110,9 @@
     <h1>Registrar Novo Atleta</h1>
     <form action="/" method="POST">
         <select id="category" name="info">
-            <option value="Sub 30">Sub 30</option>
-            <option value="Master A">Master A</option>
-            <option value="Master B">Master B</option>
-            <option value="E-Bike">E-Bike</option>
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
         </select>
         <input type="text" id="name" name="info" placeholder="Nome" required>
         <input type="number" id="number" name="info" placeholder="Número">

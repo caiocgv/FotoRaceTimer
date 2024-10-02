@@ -7,6 +7,23 @@
 </head>
 <body>
     <h1>Athletes Results</h1>
+        <form action="/results" method="POST">
+            <select name="category" id="category">
+                <option value="">Select Category</option>
+                <option value="all">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="stage" id="stage">
+                <option value="">Select Stage</option>
+                <option value="all">All Stages</option>
+                {% for stage in Athletes[0].stage %}
+                    <option value="{{ stage }}">{{ stage }}</option>
+                {% endfor %}
+            </select>
+        </form>
     <table>
         <tr>
             <th>Categoria</th>
@@ -15,13 +32,38 @@
             <th>Tempo Total</th>
         </tr>
         {% for athlete in Athletes %}
-        <tr>
-            <td>{{ athlete.category     }}</td>
-            <td>{{ athlete.name         }}</td>
-            <td>{{ athlete.number       }}</td>
-            <td>{{ athlete.totTime[-1]  }}</td>
-        </tr>
+            {% if filters=='all' or filters==athlete.category %}
+                {% if stage=='all' or stage=='' %}
+                    <tr>
+                        <td>{{ athlete.category     }}</td>
+                        <td>{{ athlete.name         }}</td>
+                        <td>{{ athlete.number       }}</td>
+                        <td>{{ athlete.totTime[-1]  }}</td>
+                    </tr>
+                {% else %}
+                    {% for i in range(0, athlete.stage|length) %}
+                        {% if stage==athlete.stage[i] %}
+                            <tr>
+                                <td>{{ athlete.category     }}</td>
+                                <td>{{ athlete.name         }}</td>
+                                <td>{{ athlete.number       }}</td>
+                                <td>{{ athlete.Time[i]      }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
         {% endfor %}
     </table>
+    <button onclick="window.location.href='/'">Return to Main Page</button>
 </body>
 </html>
+
+<script>
+    document.getElementById('category').addEventListener('change', function() {
+        this.form.submit();
+    });
+    document.getElementById('stage').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>

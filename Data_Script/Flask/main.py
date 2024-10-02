@@ -7,10 +7,13 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    global Athletes
+    global Athletes, categories, flag
+    categories = []
+
     if request.method == 'POST':
         Athletes.append(racer(request.form.getlist('info'))) if request.form.getlist('info')[1] != "" else None
         return render_template('index.html', Athletes=Athletes)
+    
     else:
         Athletes = []
         try:
@@ -19,17 +22,27 @@ def main():
 
             for data in existing_data:
                 Athletes.append(racer(data))
+
+            if isinstance(Athletes[0].stage, list):
+                flag = 'true'
+            
+            with open('categories.yaml', 'r') as file:
+                existing_data = yaml.load(file, Loader=yaml.FullLoader)
+            
+            for category in existing_data['categories']:
+                categories.append(category)
+        
         except:
             pass
 
-        return render_template('index.html', Athletes=Athletes)
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
 
 @app.route('/clear')
 def clear():
     global Athletes
     Athletes = []
     save()
-    return render_template('index.html', Athletes=Athletes)
+    return render_template('index.html', Athletes=Athletes, categories=categories)
 
 @app.route('/save')
 def save():
@@ -37,7 +50,7 @@ def save():
     athlete_data = [athlete.to_dict() for athlete in Athletes]
     with open('athletes.yaml', 'w') as file:
         yaml.dump(athlete_data, file)
-    return render_template('index.html', Athletes=Athletes)
+    return render_template('index.html', Athletes=Athletes, categories=categories)
 
 @app.route('/export') 
 def download(): 
@@ -161,21 +174,25 @@ def upload():
     else:
         return render_template('error.html', error='Invalid file type')
 
-    return render_template('index.html', Athletes=Athletes, flag=flag)
+    return render_template('index.html', Athletes=Athletes, flag=flag, categories=categories)
 
 
 @app.route('/results', methods=['GET', 'POST']) 
 def results(): 
     global Athletes
     if request.method == 'POST':
-        pass
+        filters = request.form.get('category')
+        stage   = request.form.get('stage')
+
     else:
         if flag == 'true':
             Athletes.sort(key=lambda x: x.totTime[-1].compare())
         else:
             Athletes.sort(key=lambda x: x.time.compare())
+        filters = 'all'
+        stage   = 'all'
 
-    return render_template('results.html', Athletes=Athletes)
+    return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=stage) 
 
 if __name__ == '__main__':
     app.run(debug=True) 

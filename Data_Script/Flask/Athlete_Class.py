@@ -25,26 +25,49 @@ class racer:
             self.time = Time(None)
             self.totTime = Time(None)
         elif isinstance(data, dict):
-            self.category = data.get('category')
-            self.name = data.get('name')
-            self.number = data.get('number')
-            self.stage = data.get('sNumber')
-            self.start = Time(data.get('start'))
-            self.finish = Time(data.get('finish'))
-            self.time = Time(data.get('time'))
-            self.totTime = Time(data.get('totTime'))
-    
+            if isinstance(data.get('start'), list) and isinstance(data.get('finish'), list):
+                self.category = data.get('category')
+                self.name = data.get('name')
+                self.number = data.get('number')
+                self.stage = data.get('stage')
+                self.start = [Time(start) for start in data.get('start')]
+                self.finish = [Time(finish) for finish in data.get('finish')]
+                self.time = [Time(time) for time in data.get('time')]
+                self.totTime = [Time(totTime) for totTime in data.get('totTime')]
+            else:
+                self.category = data.get('category')
+                self.name = data.get('name')
+                self.number = data.get('number')
+                self.stage = data.get('sNumber')
+                self.start = Time(data.get('start'))
+                self.finish = Time(data.get('finish'))
+                self.time = Time(data.get('time'))
+                self.totTime = Time(data.get('totTime'))
+        
     def to_dict(self):
-        return {
-            'category': self.category,
-            'name': self.name,
-            'number': self.number,
-            'stage': self.stage,
-            'start': str(self.start),
-            'finish': str(self.finish),
-            'time': str(self.time),
-            'totTime': str(self.totTime)
-        }
+        if isinstance(self.start, list) and isinstance(self.finish, list):
+            dictionary = {
+                'category': self.category,
+                'name': self.name,
+                'number': self.number,
+                'stage': self.stage,
+                'start': [str(start) for start in self.start],
+                'finish': [str(finish) for finish in self.finish],
+                'time': [str(time) for time in self.time],
+                'totTime': [str(totTime) for totTime in self.totTime]
+            }
+        else:
+            dictionary = {
+                'category': self.category,
+                'name': self.name,
+                'number': self.number,
+                'stage': self.stage,
+                'start': str(self.start),
+                'finish': str(self.finish),
+                'time': str(self.time),
+                'totTime': str(self.totTime)
+            }
+        return dictionary
     def calculate_time(self):
         if isinstance(self.start, list) and isinstance(self.finish, list):
             self.time = []
