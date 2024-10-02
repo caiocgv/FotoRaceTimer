@@ -51,7 +51,7 @@ class Time:
     def diff(self, other):
         self_millis = self.hour*3600000 + self.minute*60000 + self.second*1000 + self.millis
         other_millis = other.hour*3600000 + other.minute*60000 + other.second*1000 + other.millis
-        diff = self_millis - other_millis + 4630 # correction factor for RTC desync
+        diff = self_millis - other_millis + 4874 # correction factor for RTC desync
         hour = diff // 3600000
         diff = diff % 3600000
         minute = diff // 60000

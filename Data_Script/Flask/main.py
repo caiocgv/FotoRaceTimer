@@ -54,9 +54,10 @@ def upload():
         ValueError: If the file name is invalid.
         ValueError: If the file type is invalid.
     """
+
     
     global Athletes
-    max_stage = 0 # variable to store the max number of stages
+    max_stage = 0
 
     file = request.files.get('file')
     flag = request.form.get('flag')
@@ -103,44 +104,57 @@ def upload():
                             if str(racers.number) == str(data[i+1])[:-1]:
                                 if data[i+1][-1:] not in racers.stage:  # check if the stage is already in the list
                                     racers.stage.append(data[i+1][-1:]) # if not, add it with the start and finish time
+
                                     if file.filename.rsplit('.',1)[0].lower() == 'largada':
                                         racers.start.append(Time(data[i]))
                                         racers.finish.append(Time(None))
+
                                     elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
                                         racers.start.append(Time(None))
                                         racers.finish.append(Time(data[i]))
+
                                 else: # if the stage is already in the list, update the start or finish time
                                     if file.filename.rsplit('.',1)[0].lower() == 'largada':
                                         racers.start[racers.stage.index(data[i+1][-1:])] = Time(data[i])    # find the index of the stage and update the start time
+
                                     elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
                                         racers.finish[racers.stage.index(data[i+1][-1:])] = Time(data[i])   # find the index of the stage and update the finish time                                
                                 
-                                racers.calculate_time()
-
-
-                                # check the max number of stages                                
-                                for racers in Athletes:
-                                    max_stage = max(len(racers.stage), max_stage)
-                                    
-                                # fill the missing stages with empty data
-                                for racers in Athletes:
-                                    if len(racers.stage) < max_stage:
-                                        for i in range(max_stage - len(racers.stage)):
-                                            if str(i+1) not in racers.stage:
-                                                racers.stage.append(str(i+1))
-                                                racers.start.append(Time(None))
-                                                racers.finish.append(Time(None))
-                                                racers.time.append(Time(None))
+                                racers.calculate_time()  # calculate the time
 
                                 # check if racers.time has at least one valid time
-                                    if len(racers.time) > 0:
-                                        racers.totTime = [Time(None) for time in racers.time]
+                                if len(racers.time) > 0:
+                                    racers.totTime = [Time(None) for time in racers.time]
 
-                                        for i in range(len(racers.time)):
-                                            if i == 0:
-                                                racers.totTime[i] = racers.time[i]
-                                            else:
-                                                racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
+                                    for i in range(len(racers.time)):
+                                        if i == 0:
+                                            racers.totTime[i] = racers.time[i]
+                                        else:
+                                            racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
+
+                    # check the max number of stages                                
+                    for i in range(len(Athletes)):
+                        if len(Athletes[i].stage) > len(Athletes[max_stage].stage):
+                            max_stage = i
+                                
+                    for stage in Athletes[max_stage].stage:
+                        for racers in Athletes:
+                            if stage not in racers.stage:
+                                racers.stage.append(stage)
+                                racers.start.append(Time(None))
+                                racers.finish.append(Time(None))
+                                racers.time.append(Time('00:10:00:000'))
+
+                            # check if racers.time has at least one valid time and fill the totTime list
+                            if len(racers.time) > 0:
+                                racers.totTime = [Time(None) for time in racers.time]
+
+                            for i in range(len(racers.time)): # calculate the total time
+                                if i == 0:
+                                    racers.totTime[i] = racers.time[i]
+                                else:
+                                    racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
+
                 else:
                     return render_template('error.html', error='Invalid file name')
     else:
