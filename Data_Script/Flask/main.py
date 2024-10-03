@@ -9,6 +9,7 @@ app = Flask(__name__)
 def main():
     global Athletes, categories, flag
     categories = []
+    flag = 'false'
 
     if request.method == 'POST':
         Athletes.append(racer(request.form.getlist('info'))) if request.form.getlist('info')[1] != "" else None
@@ -25,15 +26,15 @@ def main():
 
             if isinstance(Athletes[0].stage, list):
                 flag = 'true'
-            
-            with open('categories.yaml', 'r') as file:
-                existing_data = yaml.load(file, Loader=yaml.FullLoader)
-            
-            for category in existing_data['categories']:
-                categories.append(category)
         
         except:
-            pass
+            pass        
+            
+        with open('categories.yaml', 'r') as file:
+            existing_data = yaml.load(file, Loader=yaml.FullLoader)            
+        for category in existing_data['categories']:
+            categories.append(category)
+        
 
         return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
 
@@ -50,7 +51,10 @@ def save():
     athlete_data = [athlete.to_dict() for athlete in Athletes]
     with open('athletes.yaml', 'w') as file:
         yaml.dump(athlete_data, file)
-    return render_template('index.html', Athletes=Athletes, categories=categories)
+
+    if isinstance(Athletes[0].stage, list):
+        flag = 'true'
+    return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
 
 @app.route('/export') 
 def download(): 
@@ -72,7 +76,7 @@ def upload():
     global Athletes, flag
     max_stage = 0
 
-    file = request.files.get('file')
+    file = request.files.getlist('file')
     flag = request.form.get('flag')
 
     if flag == 'true':
@@ -83,94 +87,96 @@ def upload():
             racers.finish = [] if isinstance(racers.finish, list) == False else racers.finish
             racers.time = [] if isinstance(racers.time, list) == False else racers.time
     
-    if file.filename.rsplit('.',1)[1].lower() == 'yaml':
-        file.save('athletes.yaml')
+    if file[0].filename.rsplit('.',1)[1].lower() == 'yaml':
+        file[0].save('athletes.yaml')
         with open('athletes.yaml', 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
         Athletes = [racer(data) for data in existing_data]
         return render_template('index.html', Athletes=Athletes)
-    elif file.filename.rsplit('.',1)[1].lower() == 'txt':
-        string = file.read().decode('utf-8')
-        data = string.split('\r')
+    elif file[0].filename.rsplit('.',1)[1].lower() == 'txt':
 
-        for i in range(len(data)):            
-            if ":" in data[i]:
-                if file.filename.rsplit('.',1)[0].lower() in ['largada','chegada']:
+        for files in file:
+            string = files.read().decode('utf-8')
+            data = string.split('\r')
 
-                    if len(Athletes) == 0: # check if there are athletes registered
-                        return render_template('error.html', error='No athletes registered')
-                    
-                    for racers in Athletes:
-                        if flag != 'true': 
-                            # single stage race, look for the matching number, get the time, break the loop
-                            if str(racers.number) == str(data[i+1]):
-                                if file.filename.rsplit('.',1)[0].lower() == 'largada':
-                                    racers.start = Time(data[i])
-        
-                                elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
-                                    racers.finish = Time(data[i])
+            for i in range(len(data)):            
+                if ":" in data[i]:
+                    if files.filename.rsplit('.',1)[0].lower() in ['largada','chegada']:
 
-                                racers.calculate_time()
-                                break
+                        if len(Athletes) == 0: # check if there are athletes registered
+                            return render_template('error.html', error='No athletes registered')
+                        
+                        for racers in Athletes:
+                            if flag != 'true': 
+                                # single stage race, look for the matching number, get the time, break the loop
+                                if str(racers.number) == str(data[i+1]):
+                                    if files.filename.rsplit('.',1)[0].lower() == 'largada':
+                                        racers.start = Time(data[i])
+            
+                                    elif files.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                        racers.finish = Time(data[i])
 
-                        else:   # multi stage race, look for all the matching numbers where the last digit is always the stage number
-                            if str(racers.number) == str(data[i+1])[:-1]:
-                                if data[i+1][-1:] not in racers.stage:  # check if the stage is already in the list
-                                    racers.stage.append(data[i+1][-1:]) # if not, add it with the start and finish time
+                                    racers.calculate_time()
+                                    break
 
-                                    if file.filename.rsplit('.',1)[0].lower() == 'largada':
-                                        racers.start.append(Time(data[i]))
-                                        racers.finish.append(Time(None))
+                            else:   # multi stage race, look for all the matching numbers where the last digit is always the stage number
+                                if str(racers.number) == str(data[i+1])[:-1]:
+                                    if data[i+1][-1:] not in racers.stage:  # check if the stage is already in the list
+                                        racers.stage.append(data[i+1][-1:]) # if not, add it with the start and finish time
 
-                                    elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                        if files.filename.rsplit('.',1)[0].lower() == 'largada':
+                                            racers.start.append(Time(data[i]))
+                                            racers.finish.append(Time(None))
+
+                                        elif files.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                            racers.start.append(Time(None))
+                                            racers.finish.append(Time(data[i]))
+
+                                    else: # if the stage is already in the list, update the start or finish time
+                                        if files.filename.rsplit('.',1)[0].lower() == 'largada':
+                                            racers.start[racers.stage.index(data[i+1][-1:])] = Time(data[i])    # find the index of the stage and update the start time
+
+                                        elif files.filename.rsplit('.',1)[0].lower() == 'chegada':
+                                            racers.finish[racers.stage.index(data[i+1][-1:])] = Time(data[i])   # find the index of the stage and update the finish time                                
+                                    
+                                    racers.calculate_time()  # calculate the time
+
+                                    # check if racers.time has at least one valid time
+                                    if len(racers.time) > 0:
+                                        racers.totTime = [Time(None) for time in racers.time]
+
+                                        for i in range(len(racers.time)):
+                                            if i == 0:
+                                                racers.totTime[i] = racers.time[i]
+                                            else:
+                                                racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
+
+                        # check the max number of stages
+                        if flag == 'true':                                
+                            for i in range(len(Athletes)):
+                                if len(Athletes[i].stage) > len(Athletes[max_stage].stage):
+                                    max_stage = i
+                                        
+                            for stage in Athletes[max_stage].stage:
+                                for racers in Athletes:
+                                    if stage not in racers.stage:
+                                        racers.stage.append(stage)
                                         racers.start.append(Time(None))
-                                        racers.finish.append(Time(data[i]))
+                                        racers.finish.append(Time(None))
+                                        racers.time.append(Time('00:10:00:000'))
 
-                                else: # if the stage is already in the list, update the start or finish time
-                                    if file.filename.rsplit('.',1)[0].lower() == 'largada':
-                                        racers.start[racers.stage.index(data[i+1][-1:])] = Time(data[i])    # find the index of the stage and update the start time
+                                    # check if racers.time has at least one valid time and fill the totTime list
+                                    if len(racers.time) > 0:
+                                        racers.totTime = [Time(None) for time in racers.time]
 
-                                    elif file.filename.rsplit('.',1)[0].lower() == 'chegada':
-                                        racers.finish[racers.stage.index(data[i+1][-1:])] = Time(data[i])   # find the index of the stage and update the finish time                                
-                                
-                                racers.calculate_time()  # calculate the time
-
-                                # check if racers.time has at least one valid time
-                                if len(racers.time) > 0:
-                                    racers.totTime = [Time(None) for time in racers.time]
-
-                                    for i in range(len(racers.time)):
+                                    for i in range(len(racers.time)): # calculate the total time
                                         if i == 0:
                                             racers.totTime[i] = racers.time[i]
                                         else:
                                             racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
 
-                    # check the max number of stages
-                    if flag == 'true':                                
-                        for i in range(len(Athletes)):
-                            if len(Athletes[i].stage) > len(Athletes[max_stage].stage):
-                                max_stage = i
-                                    
-                        for stage in Athletes[max_stage].stage:
-                            for racers in Athletes:
-                                if stage not in racers.stage:
-                                    racers.stage.append(stage)
-                                    racers.start.append(Time(None))
-                                    racers.finish.append(Time(None))
-                                    racers.time.append(Time('00:10:00:000'))
-
-                                # check if racers.time has at least one valid time and fill the totTime list
-                                if len(racers.time) > 0:
-                                    racers.totTime = [Time(None) for time in racers.time]
-
-                                for i in range(len(racers.time)): # calculate the total time
-                                    if i == 0:
-                                        racers.totTime[i] = racers.time[i]
-                                    else:
-                                        racers.totTime[i] = racers.totTime[i-1].add(racers.time[i]) # calculate the total time
-
-                else:
-                    return render_template('error.html', error='Invalid file name')
+                    else:
+                        return render_template('error.html', error='Invalid file name')
     else:
         return render_template('error.html', error='Invalid file type')
 
@@ -188,7 +194,7 @@ def results():
             Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())  
         else:
             Athletes.sort(key=lambda x: x.totTime[-1].compare())
-            
+
     else:
         if flag == 'true':
             Athletes.sort(key=lambda x: x.totTime[-1].compare())

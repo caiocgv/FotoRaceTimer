@@ -9,7 +9,7 @@
     <h1>Importar Arquivos</h1>
     <form action="/import" method="POST" enctype="multipart/form-data">
         <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
-        <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' onchange="form.submit()">
+        <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' multiple onchange="form.submit()">
         {% if flag == 'true' %}
             <input type="checkbox" id="flag" name="flag" value="true" checked style="display: none;">
         {% else %}
@@ -94,7 +94,7 @@
                     <input type="submit" value="Excluir todos os Atletas">
                 </form>
                 <form action="/save">
-                    <input type="submit" value="Salvar Novos Atletas">
+                    <input type="submit" value="Salvar Atletas">
                 </form>        
                 <form action="/export">
                     <input type="submit" value="Exportar lista de atletas">
