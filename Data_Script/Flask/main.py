@@ -182,17 +182,22 @@ def results():
     global Athletes
     if request.method == 'POST':
         filters = request.form.get('category')
-        stage   = request.form.get('stage')
+        special   = request.form.get('stage')
 
+        if special != 'all':
+            Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())  
+        else:
+            Athletes.sort(key=lambda x: x.totTime[-1].compare())
+            
     else:
         if flag == 'true':
             Athletes.sort(key=lambda x: x.totTime[-1].compare())
         else:
             Athletes.sort(key=lambda x: x.time.compare())
         filters = 'all'
-        stage   = 'all'
+        special = 'all'
 
-    return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=stage) 
+    return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special) 
 
 if __name__ == '__main__':
     app.run(debug=True) 

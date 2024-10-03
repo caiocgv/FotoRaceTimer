@@ -6,10 +6,18 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Athletes Results</h1>
+    {% if filters=='all' and stage=='all' %}
+        <h1>Resultados - Geral - Tempo Total</h1>
+    {% elif stage == 'all' and filters != 'all' %}
+        <h1>Resultados - Categoria: {{ filters }} - Tempo Total</h1>
+    {% elif filters == 'all' and stage != 'all' %}
+        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
+    {% else %}
+        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
+    {% endif %}
         <form action="/results" method="POST">
             <select name="category" id="category">
-                <option value="">Select Category</option>
+                <option value="all">Select Category</option>
                 <option value="all">All Categories</option>
                 {% for category in categories %}
                     <option value="{{ category }}">{{ category }}</option>
@@ -17,15 +25,18 @@
             </select>
 
             <select name="stage" id="stage">
-                <option value="">Select Stage</option>
+                <option value="all">Select Stage</option>
                 <option value="all">All Stages</option>
                 {% for stage in Athletes[0].stage %}
                     <option value="{{ stage }}">{{ stage }}</option>
                 {% endfor %}
             </select>
+
+            <input type="submit" value="Filtrar">
         </form>
     <table>
         <tr>
+            <th style="width: 40px;">Pos</th>
             <th>Categoria</th>
             <th>Nome</th>
             <th style="width: 40px;">N°</th>
@@ -33,21 +44,23 @@
         </tr>
         {% for athlete in Athletes %}
             {% if filters=='all' or filters==athlete.category %}
-                {% if stage=='all' or stage=='' %}
+                {% if stage=='all' %}
                     <tr>
-                        <td>{{ athlete.category     }}</td>
-                        <td>{{ athlete.name         }}</td>
-                        <td>{{ athlete.number       }}</td>
-                        <td>{{ athlete.totTime[-1]  }}</td>
+                        <td>{{ Athletes.index(athlete) + 1  }}</td>
+                        <td>{{ athlete.category             }}</td>
+                        <td>{{ athlete.name                 }}</td>
+                        <td>{{ athlete.number               }}</td>
+                        <td>{{ athlete.totTime[-1]          }}</td>
                     </tr>
                 {% else %}
                     {% for i in range(0, athlete.stage|length) %}
                         {% if stage==athlete.stage[i] %}
                             <tr>
-                                <td>{{ athlete.category     }}</td>
-                                <td>{{ athlete.name         }}</td>
-                                <td>{{ athlete.number       }}</td>
-                                <td>{{ athlete.Time[i]      }}</td>
+                                <td>{{ Athletes.index(athlete) + 1  }}</td>
+                                <td>{{ athlete.category             }}</td>
+                                <td>{{ athlete.name                 }}</td>
+                                <td>{{ athlete.number               }}</td>
+                                <td>{{ athlete.time[i]              }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
@@ -58,12 +71,3 @@
     <button onclick="window.location.href='/'">Return to Main Page</button>
 </body>
 </html>
-
-<script>
-    document.getElementById('category').addEventListener('change', function() {
-        this.form.submit();
-    });
-    document.getElementById('stage').addEventListener('change', function() {
-        this.form.submit();
-    });
-</script>
