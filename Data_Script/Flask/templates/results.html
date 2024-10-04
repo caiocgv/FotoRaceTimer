@@ -15,7 +15,7 @@
     {% else %}
         <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
     {% endif %}
-        <form action="/results" method="POST">
+        <form method="POST">
             <select name="category" id="category">
                 <option value="all">Select Category</option>
                 <option value="all">All Categories</option>
@@ -32,7 +32,8 @@
                 {% endfor %}
             </select>
 
-            <input type="submit" value="Filtrar">
+            <input type="submit" value="Filtrar" formaction="/results">
+            <input type="submit" value="Exportar Resultados" formaction="/export_pdf">
         </form>
     <table>
         <tr>

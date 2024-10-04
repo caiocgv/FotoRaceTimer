@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, send_file
 import yaml
 from Athlete_Class import racer
 from time_class import Time
+from flask import make_response
+import pdfkit
 
 app = Flask(__name__)
 
@@ -204,6 +206,19 @@ def results():
         special = 'all'
 
     return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special) 
+
+@app.route('/export_pdf', methods=['GET', 'POST'])
+def export_pdf():
+    global Athletes
+    if request.method == 'POST':
+        filters = request.form.get('category')
+        special = request.form.get('stage')
+
+        if special != 'all':
+            Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
+        else:
+            Athletes.sort(key=lambda x: x.totTime[-1].compare())
+    
 
 if __name__ == '__main__':
     app.run(debug=True) 
