@@ -4,7 +4,6 @@ import io
 def convert_html_to_pdf(html_text, output_filename):
     # Create a PDF file buffer
     pdf_buffer = io.BytesIO()
-    output_filename = output_filename[0]
     
     # Convert HTML to PDF using xhtml2pdf
     pisa_status = pisa.CreatePDF(io.StringIO(html_text), dest=pdf_buffer)

@@ -213,7 +213,7 @@ def export_pdf():
     if request.method == 'POST':
         output = []
         for special in Athletes[0].stage:
-            for filters in categories:
+            for filters in categories: # loop through all categories to export especific results for each category in each stage
                 Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
                 
                 # skip category if there are no athletes in it
@@ -221,12 +221,49 @@ def export_pdf():
                 if size == 0:
                     continue
                 
-                output.append('Resultado Categoria: ' + filters + ' - Especial ' + special + '.pdf')
+                output.append('Resultado Categoria - ' + filters + ' - Especial ' + special + '.pdf')
                 size = '58mm ' + str(size*6+30) + 'mm'
                 
                 
-                #return render_template('export_results.html',Athletes=Athletes,filters=filters,stage=special, output=output)
-                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=output[-1:][:-4], size=size), output[-1:])
+                file_title = output[len(output)-1]
+                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=file_title[:-4], size=size), file_title)
+
+        for special in Athletes[0].stage: # loop through all stages to export the general results for each stage
+            Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
+                
+            # skip category if there are no athletes in it
+            size = len([athlete for athlete in Athletes])
+                
+            output.append('Resultado Geral' + ' - Especial ' + special + '.pdf') # define filename and title
+            size = '58mm ' + str(size*6+30) + 'mm' # define the size of the pdf
+            
+            file_title = output[len(output)-1]
+            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage=special, output=file_title[:-4], size=size), file_title)
+
+        for filters in categories: # loop through all categories to export the general results for each category
+            Athletes.sort(key=lambda x: x.totTime[-1].compare())
+                
+            # skip category if there are no athletes in it
+            size = len([athlete for athlete in Athletes if athlete.category == filters])
+            if size == 0:
+                continue
+                
+            output.append('Resultado Categoria - ' + filters + ' - Geral.pdf') # define filename and title
+            size = '58mm ' + str(size*6+30) + 'mm'
+
+            file_title = output[len(output)-1]
+
+            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size), file_title)
+        
+        # export the general results for all categories
+        size = len([athlete for athlete in Athletes])
+        output.append('Resultado Geral.pdf')
+        size = '58mm ' + str(size*6+30) + 'mm'
+
+        file_title = output[len(output)-1]
+
+        convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size), file_title)
+
 
         with zipfile.ZipFile('results.zip', 'w') as zipf:
             for file in output:
