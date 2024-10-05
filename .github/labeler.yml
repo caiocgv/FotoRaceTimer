@@ -7,3 +7,5 @@ bug:
     - '(not working|Not showing|Issue|bug|error|shouldn)'
 documentation:
     - '(schematic|folder|documentation)'
+flaskapp:
+    -'(app)'
