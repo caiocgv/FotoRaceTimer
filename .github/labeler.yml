@@ -2,8 +2,10 @@
 critical:
     - '(critical|urgent)'
 enhancement:
-    - '(create|improve|include|generate|implement)'
+    - '(Create|Improve|Include|generate|Implement|should|Should)'
 bug:
-    - '(not working|not showing|issue|bug)'
+    - '(not working|Not showing|Issue|bug|error|shouldn)'
 documentation:
     - '(schematic|folder|documentation)'
+flaskapp:
+    -'(app)'

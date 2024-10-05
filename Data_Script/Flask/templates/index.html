@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title|default("Race Sheet")}}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Registrar Atletas</h1>
+    <form action="/" method="POST">
+        <select id="category" name="info">
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" id="name" name="info" placeholder="Nome" required>
+        <input type="number" id="number" name="info" placeholder="Número">
+        
+        <input type="submit" value="Enviar">
+    </form> 
+
+    <br>
+    <hr>
+
+    <h1>Importar Arquivos</h1>
+    <form action="/import" method="POST" enctype="multipart/form-data">
+        <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
+        <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' multiple onchange="form.submit()">
+        {% if flag == 'true' %}
+            <input type="checkbox" id="flag" name="flag" value="true" checked style="display: none;">
+        {% else %}
+            <input type="checkbox" id="flag" name="flag" value="true">
+            <label for="flag">Enduro</label>
+        {% endif %}
+    </form>
+    
+    <br>
+    <hr>
+
+    {% if flag == 'true' %}
+        {% if Athletes %}
+            <h1>Atletas Inscritos</h1>
+            <table>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Nome</th>
+                    <th>Número</th>
+                    <th>N°E</th>
+                    <th>Largada</th>
+                    <th>Chegada</th>
+                    <th>Tempo</th>
+                    <th>Tempo Total</th>
+                </tr>
+                {% for athlete in Athletes %}
+                    <tr>
+                        <td rowspan="{{athlete.stage | length + 1}}">{{ athlete.category }}</td>
+                        <td rowspan="{{athlete.stage | length + 1}}">{{ athlete.name     }}</td>
+                        <td rowspan="{{athlete.stage | length + 1}}">{{ athlete.number   }}</td>
+                    </tr>
+                    {% for stage in athlete.stage %}
+                        <tr>
+                            <td>{{ stage }}</td>
+                            <td>{{ athlete.start[loop.index0]       }}</td>
+                            <td>{{ athlete.finish[loop.index0]      }}</td>
+                            <td>{{ athlete.time[loop.index0]        }}</td>
+                            <td>{{ athlete.totTime[loop.index0]     }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+            
+    <br>
+    <hr>
+
+            <div>                
+                <form action="/results">
+                    <input type="submit" value="Ver Resultados">
+                </form>        
+                <form action="/export">
+                    <input type="submit" value="Exportar lista de atletas">
+                </form>
+                <form action="/clear">
+                    <input type="submit" value="Excluir todos os Atletas">
+                </form>
+            </div>
+        {% endif %}
+    {% else %}
+        {% if Athletes %}
+            <h1>Atletas Inscritos</h1>
+            <table>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Nome</th>
+                    <th>Número</th>
+                    <th>Largada</th>
+                    <th>Chegada</th>
+                    <th>Tempo</th>
+                </tr>
+                {% for athlete in Athletes %}
+                <tr>
+                    <td>{{ athlete.category }}</td>
+                    <td>{{ athlete.name     }}</td>
+                    <td>{{ athlete.number   }}</td>
+                    <td>{{ athlete.start    }}</td>
+                    <td>{{ athlete.finish   }}</td>
+                    <td>{{ athlete.time     }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        
+    <br>
+    <hr>
+
+            <div>
+                
+                <form action="/results">
+                    <input type="submit" value="Ver Resultados">
+                </form>        
+                <form action="/export">
+                    <input type="submit" value="Exportar lista de atletas">
+                </form>                
+                <form action="/clear">
+                    <input type="submit" value="Excluir todos os Atletas">
+                </form>
+            </div>
+        {% endif %}
+    {% endif %}
+    
+</body>
+</html>
