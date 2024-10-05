@@ -211,14 +211,17 @@ def results():
                 Athletes.sort(key=lambda x: x.totTime[-1].compare())
             else:
                 Athletes.sort(key=lambda x: x.time.compare())
+                flag = 'false'
     else:
         if flag == 'true':
             Athletes.sort(key=lambda x: x.totTime[-1].compare())
         else:
             Athletes.sort(key=lambda x: x.time.compare())
+            flag = 'false'
         filters = 'all'
         special = 'all'
     
+    print (render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special, flag=flag))
     return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special, flag=flag) 
 
 @app.route('/export_pdf', methods=['GET', 'POST'])
