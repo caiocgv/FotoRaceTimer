@@ -6,24 +6,16 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    {% if filters=='all' and stage=='all' %}
-        <h1>Resultados - Geral - Tempo Total</h1>
-    {% elif stage == 'all' and filters != 'all' %}
-        <h1>Resultados - Categoria: {{ filters }} - Tempo Total</h1>
-    {% elif filters == 'all' and stage != 'all' %}
-        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
-    {% else %}
-        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
-    {% endif %}
         <form method="POST">
             <select name="category" id="category">
-                <option value="all">Select Category</option>
-                <option value="all">All Categories</option>
+                <option value="all">Selecionar Categoria</option>
+                <option value="all">Geral</option>
                 {% for category in categories %}
                     <option value="{{ category }}">{{ category }}</option>
                 {% endfor %}
             </select>
 
+        {% if flag == 'true' %}
             <select name="stage" id="stage">
                 <option value="all">Select Stage</option>
                 <option value="all">All Stages</option>
@@ -32,16 +24,39 @@
                 {% endfor %}
             </select>
 
-            <input type="submit" value="Filtrar" formaction="/results">
-            <input type="submit" value="Exportar Resultados" formaction="/export_pdf">
+        {% else %}
+            <input type="checkbox" id="stage" name="stage" value="all" checked style="display: none;">
+
+        {% endif %}
+
+        <select name="flag" id="flag" style="display: none;">
+            <option value={{flag}}></option>
+        </select>
+            <input type="submit" value="Imprimir Resultados" formaction="/export_pdf">
         </form>
+        
+    {% if filters=='all' and stage=='all' and flag=='true' %}
+        <h1>Resultados - Geral - Tempo Total</h1>
+    {% elif filters=='all' and stage=='all' and flag=='false' %}
+        <h1>Resultados - Geral</h1>
+    {% elif stage == 'all' and filters != 'all' and flag == 'true' %}
+        <h1>Resultados - Categoria: {{ filters }} - Tempo Geral</h1>
+    {% elif stage == 'all' and filters != 'all' and flag == 'false' %}
+        <h1>Resultados - Categoria: {{ filters }}</h1>
+    {% elif filters == 'all' and stage != 'all' %}
+        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
+    {% else %}
+        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
+    {% endif %}
+    
     <table>
+        {% if flag == 'true' %}
         <tr>
             <th style="width: 40px;">Pos</th>
             <th>Categoria</th>
             <th>Nome</th>
             <th style="width: 40px;">N°</th>
-            <th>Tempo Total</th>
+            <th>Tempo</th>
         </tr>
         {% for athlete in Athletes %}
             {% if filters=='all' or filters==athlete.category %}
@@ -68,7 +83,39 @@
                 {% endif %}
             {% endif %}
         {% endfor %}
+        {% else %}
+        <tr>
+            <th style="width: 40px;">Pos</th>
+            <th>Categoria</th>
+            <th>Nome</th>
+            <th style="width: 40px;">N°</th>
+            <th>Tempo</th>
+        </tr>
+        {% for athlete in Athletes %}
+            {% if filters=='all' or filters==athlete.category %}
+                    <tr>
+                        <td>{{ Athletes.index(athlete) + 1  }}</td>
+                        <td>{{ athlete.category             }}</td>
+                        <td>{{ athlete.name                 }}</td>
+                        <td>{{ athlete.number               }}</td>
+                        <td>{{ athlete.time                 }}</td>
+                    </tr>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
     </table>
-    <button onclick="window.location.href='/'">Return to Main Page</button>
+    <button onclick="window.location.href='/'">Retornar</button>
 </body>
 </html>
+<script>
+    var flag = document.getElementById('flag')
+    if (flag.value == 'false') {
+    document.getElementById('category').addEventListener('change', function() {
+        this.form.submit()
+        })}
+    else {
+        document.getElementById('stage').addEventListener('change', function() {
+            this.form.submit()
+        })
+    }
+</script>

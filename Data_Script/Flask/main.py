@@ -10,14 +10,17 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def main():
     global Athletes, categories, flag
-    categories = []
-    flag = 'false'
 
     if request.method == 'POST':
         Athletes.append(racer(request.form.getlist('info'))) if request.form.getlist('info')[1] != "" else None
-        return render_template('index.html', Athletes=Athletes)
+        flag = 'false'
+        save()
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
     
     else:
+        
+        categories = []
+        flag = 'false'
         Athletes = []
         try:
             with open('athletes.yaml', 'r') as file:
@@ -54,8 +57,11 @@ def save():
     with open('athletes.yaml', 'w') as file:
         yaml.dump(athlete_data, file)
 
-    if isinstance(Athletes[0].stage, list):
+    if len(Athletes)>0 and isinstance(Athletes[0].stage, list):
         flag = 'true'
+    else:
+        flag = 'false'
+    
     return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
 
 @app.route('/export') 
@@ -91,10 +97,15 @@ def upload():
     
     if file[0].filename.rsplit('.',1)[1].lower() == 'yaml':
         file[0].save('athletes.yaml')
+        
         with open('athletes.yaml', 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
         Athletes = [racer(data) for data in existing_data]
-        return render_template('index.html', Athletes=Athletes)
+        if isinstance(Athletes[0].stage, list):
+            flag = 'true'
+
+        return render_template('index.html', Athletes=Athletes, flag=flag, categories=categories)
+    
     elif file[0].filename.rsplit('.',1)[1].lower() == 'txt':
 
         for files in file:
@@ -181,13 +192,14 @@ def upload():
                         return render_template('error.html', error='Invalid file name')
     else:
         return render_template('error.html', error='Invalid file type')
-
+    save()
     return render_template('index.html', Athletes=Athletes, flag=flag, categories=categories)
 
 
 @app.route('/results', methods=['GET', 'POST']) 
 def results(): 
-    global Athletes
+    global Athletes, flag, categories
+
     if request.method == 'POST':
         filters = request.form.get('category')
         special   = request.form.get('stage')
@@ -195,81 +207,109 @@ def results():
         if special != 'all':
             Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())  
         else:
-            Athletes.sort(key=lambda x: x.totTime[-1].compare())
-
+            if flag == 'true':
+                Athletes.sort(key=lambda x: x.totTime[-1].compare())
+            else:
+                Athletes.sort(key=lambda x: x.time.compare())
+                flag = 'false'
     else:
         if flag == 'true':
             Athletes.sort(key=lambda x: x.totTime[-1].compare())
         else:
             Athletes.sort(key=lambda x: x.time.compare())
+            flag = 'false'
         filters = 'all'
         special = 'all'
-
-    return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special) 
+    
+    print (render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special, flag=flag))
+    return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special, flag=flag) 
 
 @app.route('/export_pdf', methods=['GET', 'POST'])
 def export_pdf():
-    global Athletes
+    global Athletes, flag
     if request.method == 'POST':
-        output = []
-        for special in Athletes[0].stage:
-            for filters in categories: # loop through all categories to export especific results for each category in each stage
+        if flag == 'true':
+            output = []
+            for special in Athletes[0].stage:
+                for filters in categories: # loop through all categories to export especific results for each category in each stage
+                    Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
+                    
+                    # skip category if there are no athletes in it
+                    size = len([athlete for athlete in Athletes if athlete.category == filters])
+                    if size == 0:
+                        continue
+                    
+                    output.append('Resultado Categoria - ' + filters + ' - Especial ' + special + '.pdf')
+                    size = '58mm ' + str(size*6+30) + 'mm'
+                    
+                    
+                    file_title = output[len(output)-1]
+                    convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=file_title[:-4], size=size), file_title)
+
+            for special in Athletes[0].stage: # loop through all stages to export the general results for each stage
                 Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
+                    
+                # skip category if there are no athletes in it
+                size = len([athlete for athlete in Athletes])
+                    
+                output.append('Resultado Geral' + ' - Especial ' + special + '.pdf') # define filename and title
+                size = '58mm ' + str(size*6+30) + 'mm' # define the size of the pdf
                 
+                file_title = output[len(output)-1]
+                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage=special, output=file_title[:-4], size=size), file_title)
+
+            for filters in categories: # loop through all categories to export the general results for each category
+                Athletes.sort(key=lambda x: x.totTime[-1].compare())
+                    
                 # skip category if there are no athletes in it
                 size = len([athlete for athlete in Athletes if athlete.category == filters])
                 if size == 0:
                     continue
-                
-                output.append('Resultado Categoria - ' + filters + ' - Especial ' + special + '.pdf')
+                    
+                output.append('Resultado Categoria - ' + filters + ' - Geral.pdf') # define filename and title
                 size = '58mm ' + str(size*6+30) + 'mm'
-                
-                
+
                 file_title = output[len(output)-1]
-                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=file_title[:-4], size=size), file_title)
 
-        for special in Athletes[0].stage: # loop through all stages to export the general results for each stage
-            Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
-                
-            # skip category if there are no athletes in it
-            size = len([athlete for athlete in Athletes])
-                
-            output.append('Resultado Geral' + ' - Especial ' + special + '.pdf') # define filename and title
-            size = '58mm ' + str(size*6+30) + 'mm' # define the size of the pdf
+                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size), file_title)
             
-            file_title = output[len(output)-1]
-            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage=special, output=file_title[:-4], size=size), file_title)
-
-        for filters in categories: # loop through all categories to export the general results for each category
-            Athletes.sort(key=lambda x: x.totTime[-1].compare())
-                
-            # skip category if there are no athletes in it
-            size = len([athlete for athlete in Athletes if athlete.category == filters])
-            if size == 0:
-                continue
-                
-            output.append('Resultado Categoria - ' + filters + ' - Geral.pdf') # define filename and title
+            # export the general results for all categories
+            size = len([athlete for athlete in Athletes])
+            output.append('Resultado Geral.pdf')
             size = '58mm ' + str(size*6+30) + 'mm'
 
             file_title = output[len(output)-1]
-
-            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size), file_title)
+            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size), file_title)
         
-        # export the general results for all categories
-        size = len([athlete for athlete in Athletes])
-        output.append('Resultado Geral.pdf')
-        size = '58mm ' + str(size*6+30) + 'mm'
+        else:
+            output = []
+            for filters in categories: # loop through all categories to export especific results for each category
+                Athletes.sort(key=lambda x: x.time.compare())
+                    
+                # skip category if there are no athletes in it
+                size = len([athlete for athlete in Athletes if athlete.category == filters])
+                if size == 0:
+                    continue
+                    
+                output.append('Resultado Categoria - ' + filters + '.pdf')
+                size = '58mm ' + str(size*6+30) + 'mm'
+                
+                file_title = output[len(output)-1]
+                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size, flag=flag), file_title)
+            
+            # export the general results for all categories
+            size = len([athlete for athlete in Athletes])
+            output.append('Resultado Geral.pdf')
+            size = '58mm ' + str(size*6+30) + 'mm'
 
-        file_title = output[len(output)-1]
+            file_title = output[len(output)-1]
+            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size, flag=flag), file_title)
 
-        convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size), file_title)
-
-
+        print(output)
         with zipfile.ZipFile('results.zip', 'w') as zipf:
             for file in output:
                 zipf.write(file)
         return send_file('results.zip', as_attachment=True)
-    
     
 if __name__ == '__main__':
     app.run(debug=True) 

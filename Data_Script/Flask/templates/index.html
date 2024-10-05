@@ -6,6 +6,22 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <h1>Registrar Atletas</h1>
+    <form action="/" method="POST">
+        <select id="category" name="info">
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" id="name" name="info" placeholder="Nome" required>
+        <input type="number" id="number" name="info" placeholder="Número">
+        
+        <input type="submit" value="Enviar">
+    </form> 
+
+    <br>
+    <hr>
+
     <h1>Importar Arquivos</h1>
     <form action="/import" method="POST" enctype="multipart/form-data">
         <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
@@ -14,9 +30,13 @@
             <input type="checkbox" id="flag" name="flag" value="true" checked style="display: none;">
         {% else %}
             <input type="checkbox" id="flag" name="flag" value="true">
-            <label for="flag">Multi Stage Race</label>
+            <label for="flag">Enduro</label>
         {% endif %}
     </form>
+    
+    <br>
+    <hr>
+
     {% if flag == 'true' %}
         {% if Athletes %}
             <h1>Atletas Inscritos</h1>
@@ -48,19 +68,19 @@
                     {% endfor %}
                 {% endfor %}
             </table>
+            
+    <br>
+    <hr>
 
-            <div>
-                <form action="/clear">
-                    <input type="submit" value="Excluir todos os Atletas">
-                </form>
-                <form action="/save">
-                    <input type="submit" value="Salvar Novos Atletas">
+            <div>                
+                <form action="/results">
+                    <input type="submit" value="Ver Resultados">
                 </form>        
                 <form action="/export">
                     <input type="submit" value="Exportar lista de atletas">
                 </form>
-                <form action="/results">
-                    <input type="submit" value="Ver Resultados">
+                <form action="/clear">
+                    <input type="submit" value="Excluir todos os Atletas">
                 </form>
             </div>
         {% endif %}
@@ -88,39 +108,23 @@
                 {% endfor %}
             </table>
         
+    <br>
+    <hr>
 
             <div>
-                <form action="/clear">
-                    <input type="submit" value="Excluir todos os Atletas">
-                </form>
-                <form action="/save">
-                    <input type="submit" value="Salvar Atletas">
+                
+                <form action="/results">
+                    <input type="submit" value="Ver Resultados">
                 </form>        
                 <form action="/export">
                     <input type="submit" value="Exportar lista de atletas">
-                </form>
-                <form action="/results">
-                    <input type="submit" value="Ver Resultados">
+                </form>                
+                <form action="/clear">
+                    <input type="submit" value="Excluir todos os Atletas">
                 </form>
             </div>
         {% endif %}
     {% endif %}
-    <hr>
     
-    <h1>Registrar Novo Atleta</h1>
-    <form action="/" method="POST">
-        <select id="category" name="info">
-            {% for category in categories %}
-                <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" id="name" name="info" placeholder="Nome" required>
-        <input type="number" id="number" name="info" placeholder="Número">
-        
-        <input type="submit" value="Enviar">
-    </form>
-    <form action="/" method="get">
-        <input type="submit" value="Recarregar">
-    </form>
 </body>
 </html>

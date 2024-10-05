@@ -23,12 +23,19 @@
         </tr>
         {% for athlete in Athletes %}
             {% if filters=='all' or filters==athlete.category %}
-                {% if stage=='all' %}
+                {% if stage=='all' and flag == 'true' %}
                     <tr>
                         <td>{{ Athletes.index(athlete) + 1 }}</td>
                         <td>{{ athlete.name                }}</td>
                         <td>{{ athlete.number              }}</td>
                         <td>{{ athlete.totTime[-1]          }}</td>
+                    </tr>
+                {% elif flag == 'false' %}
+                    <tr>
+                        <td>{{ Athletes.index(athlete) + 1 }}</td>
+                        <td>{{ athlete.name                }}</td>
+                        <td>{{ athlete.number              }}</td>
+                        <td>{{ athlete.time                }}</td>
                     </tr>
                 {% else %}
                     {% for i in range(0, athlete.stage|length) %}
