@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, send_file
+import zipfile
 import yaml
 from Athlete_Class import racer
 from time_class import Time
@@ -210,36 +211,27 @@ def results():
 def export_pdf():
     global Athletes
     if request.method == 'POST':
-        filters = request.form.get('category')
-        special = request.form.get('stage')
+        output = []
+        for special in Athletes[0].stage:
+            for filters in categories:
+                Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
+                
+                # skip category if there are no athletes in it
+                size = len([athlete for athlete in Athletes if athlete.category == filters])
+                if size == 0:
+                    continue
+                
+                output.append('Resultado Categoria: ' + filters + ' - Especial ' + special + '.pdf')
+                size = '58mm ' + str(size*6+30) + 'mm'
+                
+                
+                #return render_template('export_results.html',Athletes=Athletes,filters=filters,stage=special, output=output)
+                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=output[-1:][:-4], size=size), output[-1:])
 
-        if special != 'all':
-            Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
-        else:
-            Athletes.sort(key=lambda x: x.totTime[-1].compare())
-
-        # Create the output file name based on the selected filters
-        if filters=='all' and special=='all':
-            output = 'Resultado Geral - Tempo Total'
-        elif special == 'all' and filters != 'all':
-            output = 'Resultado Categoria: ' + filters + ' - Tempo Total'
-        elif filters == 'all' and special != 'all':
-            output = 'Resultado Geral - Especial ' + special
-        else:
-            output = 'Resultado Categoria: ' + filters + ' - Especial ' + special
-
-        output = output + '.pdf'
-
-        if filters == 'all':
-            size = len(Athletes)
-        else:
-            size = len([athlete for athlete in Athletes if athlete.category == filters])
-
-        size = '58mm ' + str(size*6+30) + 'mm'
-
-        #return render_template('export_results.html',Athletes=Athletes,filters=filters,stage=special, output=output)
-        convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=output[:-4], size=size), output)
-        return send_file(output, as_attachment=True)
+        with zipfile.ZipFile('results.zip', 'w') as zipf:
+            for file in output:
+                zipf.write(file)
+        return send_file('results.zip', as_attachment=True)
     
     
 if __name__ == '__main__':
