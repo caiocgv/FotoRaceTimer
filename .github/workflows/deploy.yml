@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'  # Specify the Python version you need
+        python-version: '3.11.2'  # Specify the Python version you need
 
     - name: Install dependencies
       run: |
@@ -28,7 +28,9 @@ jobs:
         USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
         API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
       run: |
+        APP_DIR="Data_Script\Flask"  # Specify the correct folder
         ZIP_FILE="deploy.zip"
+        cd $APP_DIR
         zip -r $ZIP_FILE . -x "*.git*"
         curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/files/path/home/$USERNAME/$ZIP_FILE" \
           -H "Authorization: Token $API_TOKEN" \
