@@ -17,6 +17,6 @@ def convert_html_to_pdf(html_text, output_filename):
         print("Error in PDF generation")
 
 # Example usage
-html_text = "<style>@page{size: 58mm 100mm;}</style><h1>Hello, World!</h1><p>This is a test PDF document.</p>"
+'''html_text = "<style>@page{size: 58mm 100mm;}</style><h1>Hello, World!</h1><p>This is a test PDF document.</p>"
 output_filename = "output.pdf"
-convert_html_to_pdf(html_text, output_filename)
+convert_html_to_pdf(html_text, output_filename)'''

@@ -2,8 +2,7 @@ from flask import Flask, render_template, request, send_file
 import yaml
 from Athlete_Class import racer
 from time_class import Time
-from flask import make_response
-import pdfkit
+from pdf_generator import convert_html_to_pdf
 
 app = Flask(__name__)
 
@@ -218,8 +217,31 @@ def export_pdf():
             Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
         else:
             Athletes.sort(key=lambda x: x.totTime[-1].compare())
-    
 
+        # Create the output file name based on the selected filters
+        if filters=='all' and special=='all':
+            output = 'Resultado Geral - Tempo Total'
+        elif special == 'all' and filters != 'all':
+            output = 'Resultado Categoria: ' + filters + ' - Tempo Total'
+        elif filters == 'all' and special != 'all':
+            output = 'Resultado Geral - Especial ' + special
+        else:
+            output = 'Resultado Categoria: ' + filters + ' - Especial ' + special
+
+        output = output + '.pdf'
+
+        if filters == 'all':
+            size = len(Athletes)
+        else:
+            size = len([athlete for athlete in Athletes if athlete.category == filters])
+
+        size = '58mm ' + str(size*6+30) + 'mm'
+
+        #return render_template('export_results.html',Athletes=Athletes,filters=filters,stage=special, output=output)
+        convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=output[:-4], size=size), output)
+        return send_file(output, as_attachment=True)
+    
+    
 if __name__ == '__main__':
     app.run(debug=True) 
     

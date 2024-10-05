@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{output|default("Race Sheet")}}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <style>
+        @page {
+            size: {{size}};
+            margin: 15px;
+        }
+    </style>
+
+    <h1>{{output}}</h1>
+    <table style="text-align: center;" border="1" cellpadding="2">
+        <tr>
+            <th style="width: 25px;">Pos     </th>
+            <th>                     Nome    </th>
+            <th style="width: 20px;">N°      </th>
+            <th style="width: 80px;">Tempo   </th>
+        </tr>
+        {% for athlete in Athletes %}
+            {% if filters=='all' or filters==athlete.category %}
+                {% if stage=='all' %}
+                    <tr>
+                        <td>{{ Athletes.index(athlete) + 1 }}</td>
+                        <td>{{ athlete.name                }}</td>
+                        <td>{{ athlete.number              }}</td>
+                        <td>{{ athlete.totTime[-1]          }}</td>
+                    </tr>
+                {% else %}
+                    {% for i in range(0, athlete.stage|length) %}
+                        {% if stage==athlete.stage[i] %}
+                            <tr>
+                                <td>{{ Athletes.index(athlete) + 1  }}</td>
+                                <td>{{ athlete.name                 }}</td>
+                                <td>{{ athlete.number               }}</td>
+                                <td>{{ athlete.time[i]              }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </table>
+
+</body>
+</html>
