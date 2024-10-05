@@ -54,7 +54,7 @@ class racer:
                 'start': [str(start) for start in self.start],
                 'finish': [str(finish) for finish in self.finish],
                 'time': [str(time) for time in self.time],
-                'totTime': [str(totTime) for totTime in self.totTime]
+                'totTime': [str(totTime) for totTime in self.totTime]  if self.totTime != None else None
             }
         else:
             dictionary = {
