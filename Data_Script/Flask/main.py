@@ -314,6 +314,25 @@ def export_pdf():
                 zipf.write(file)
         return send_file('/home/vianacc/results.zip', as_attachment=True)
     
+@app.route('/category', methods=['POST'])
+def update_category():
+    global categories
+
+    new_category = request.form.get('categoria')
+
+    if new_category and new_category not in categories: # check if the category is already in the list
+        categories.append(new_category)
+        save_categories()
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
+    else:
+        return render_template('error.html', error='Categoria já cadastrada ou inválida.')
+
+def save_categories():
+    global categories
+    category_data = {'categories': categories}
+    with open('categories.yaml', 'w') as file:
+        yaml.dump(category_data, file)
+    
 if __name__ == '__main__':
     app.run(debug=True) 
     
