@@ -32,7 +32,7 @@ jobs:
         ZIP_FILE="deploy.zip"
         cd $APP_DIR
         zip -r $ZIP_FILE . -x "*.git*"
-        curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/files/path/home/$USERNAME/$ZIP_FILE" \
+        curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/files/home/$USERNAME/mysite/$ZIP_FILE" \
           -H "Authorization: Token $API_TOKEN" \
           --form "content=@$ZIP_FILE"
 
