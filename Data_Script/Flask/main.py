@@ -47,7 +47,7 @@ def main():
             Time.calibrate(Time(existing_data['calib_times'][0]), Time(existing_data['calib_times'][1]))
         
 
-        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calibration_offset)
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
 
 @app.route('/clear')
 def clear():
@@ -345,7 +345,7 @@ def update_category():
         if calib_start and calib_finish:
             Time.calibrate(calib_start, calib_finish)
             calib_times = [calib_start, calib_finish]
-            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calibration_offset)
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
         else:
             return render_template('error.html', error='Invalid calibration files')
     else:
