@@ -81,3 +81,4 @@ class Time:
         global calibration_offset
         diff = time1.diff(time2)
         calibration_offset = diff.compare()
+        print(f'Calibration offset: {calibration_offset}')
