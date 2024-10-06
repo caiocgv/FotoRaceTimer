@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, send_file
 import zipfile
 import yaml
 from Athlete_Class import racer
-from time_class import Time
+from time_class import Time, calibration_offset
 from pdf_generator import convert_html_to_pdf
 
 app = Flask(__name__)
@@ -42,9 +42,12 @@ def main():
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
         for category in existing_data['categories']:
             categories.append(category)
+
+        if existing_data['calib_times']:
+            Time.calibrate(Time(existing_data['calib_times'][0]), Time(existing_data['calib_times'][1]))
         
 
-        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calibration_offset)
 
 @app.route('/clear')
 def clear():
@@ -316,20 +319,45 @@ def export_pdf():
     
 @app.route('/category', methods=['POST'])
 def update_category():
-    global categories
+    global categories, calib_times
 
     new_category = request.form.get('categoria')
+    calib = request.form.getlist('calib')
 
     if new_category and new_category not in categories: # check if the category is already in the list
         categories.append(new_category)
         save_categories()
         return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
+    elif calib:
+        for file in calib:
+            if file.filename.rsplit('.', 1)[0].lower() in ['largada', 'chegada']:
+                string = file.read().decode('utf-8')
+                data = string.split('\r')
+
+                for i in range(len(data)):
+                    if ":" in data[i]:
+                        if file.filename.rsplit('.', 1)[0].lower() == 'largada':
+                            calib_start = Time(data[i])
+                            break
+                        elif file.filename.rsplit('.', 1)[0].lower() == 'chegada':
+                            calib_finish = Time(data[i])
+                            break
+        if calib_start and calib_finish:
+            Time.calibrate(calib_start, calib_finish)
+            calib_times = [calib_start, calib_finish]
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calibration_offset)
+        else:
+            return render_template('error.html', error='Invalid calibration files')
     else:
-        return render_template('error.html', error='Categoria já cadastrada ou inválida.')
+        return render_template('error.html', error='Invalid category name')
+    
+                        
 
 def save_categories():
     global categories
-    category_data = {'categories': categories}
+    category_data = {'categories': categories,
+                     'calib_times': calib_times}
+    
     with open('categories.yaml', 'w') as file:
         yaml.dump(category_data, file)
     
