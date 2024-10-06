@@ -4,7 +4,6 @@ import yaml
 from Athlete_Class import racer
 from time_class import Time
 from pdf_generator import convert_html_to_pdf
-import os
 
 app = Flask(__name__)
 
@@ -24,7 +23,7 @@ def main():
         flag = 'false'
         Athletes = []
         try:
-            absolute_path = os.path.abspath('athletes.yaml')
+            absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/athletes.yaml'
 
             with open(absolute_path, 'r') as file:
                 existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -38,7 +37,7 @@ def main():
         except:
             pass        
             
-        absolute_path = os.path.abspath('categories.yaml')
+        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
