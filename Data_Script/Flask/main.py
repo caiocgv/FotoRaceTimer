@@ -4,6 +4,7 @@ import yaml
 from Athlete_Class import racer
 from time_class import Time
 from pdf_generator import convert_html_to_pdf
+import os
 
 app = Flask(__name__)
 
@@ -23,7 +24,9 @@ def main():
         flag = 'false'
         Athletes = []
         try:
-            with open('athletes.yaml', 'r') as file:
+            absolute_path = os.path.abspath('athletes.yaml')
+
+            with open(absolute_path, 'r') as file:
                 existing_data = yaml.load(file, Loader=yaml.FullLoader)
 
             for data in existing_data:
@@ -35,8 +38,10 @@ def main():
         except:
             pass        
             
-        with open('categories.yaml', 'r') as file:
-            existing_data = yaml.load(file, Loader=yaml.FullLoader)            
+        absolute_path = os.path.abspath('categories.yaml')
+
+        with open(absolute_path, 'r') as file:
+            existing_data = yaml.load(file, Loader=yaml.FullLoader)
         for category in existing_data['categories']:
             categories.append(category)
         
