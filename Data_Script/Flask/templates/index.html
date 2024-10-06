@@ -82,6 +82,14 @@
                 <form action="/clear">
                     <input type="submit" value="Excluir todos os Atletas">
                 </form>
+                <form action="/category" method="POST">
+                    <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: 50%;">
+                    <input type="submit" value="Enviar">
+                </form>
+                <form action="/category" method="post">
+                    <button type="button" onclick="document.getElementById('calib_files').click()">Escolha o Arquivo de calibração</button>
+                    <input style="display: none;" id="calib_files" type='file' accept='.txt' name='calib_files' multiple onchange="form.submit()">
+                </form>
             </div>
         {% endif %}
     {% else %}
@@ -122,18 +130,16 @@
                 <form action="/clear">
                     <input type="submit" value="Excluir todos os Atletas">
                 </form>
+                <form action="/category" method="POST">
+                    <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: 50%;">
+                    <input type="submit" value="Enviar">
+                </form>
+                <form action="/category" method="post">
+                    <button type="button" onclick="document.getElementById('calib_files').click()">Escolha o Arquivo de calibração</button>
+                    <input style="display: none;" id="calib_files" type='file' accept='.txt' name='calib_files' multiple onchange="form.submit()">
+                </form>
             </div>
         {% endif %}
     {% endif %}
-    <div>
-    <form action="/category" method="POST">
-        <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: 50%;">
-        <input type="submit" value="Enviar">
-    </form>
-    <form action="/category" method="post">
-        <button type="button" onclick="document.getElementById('calib_files').click()">Escolha o Arquivo de calibração</button>
-        <input style="display: none;" id="calib_files" type='file' accept='.txt' name='calib_files' multiple onchange="form.submit()">
-    </form>
-    </div>
 </body>
 </html>
