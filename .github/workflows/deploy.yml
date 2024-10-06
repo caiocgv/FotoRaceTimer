@@ -28,9 +28,9 @@ jobs:
         USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
         API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
       run: |
-        # APP_DIR="\Data_Script\Flask"  # Specify the correct folder
+        APP_DIR="Data_Script/Flask"  # Specify the correct folder
         ZIP_FILE="deploy.zip"
-        # cd $APP_DIR
+        cd $APP_DIR
         zip -r $ZIP_FILE . -x "*.git*"
         curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/files/path/home/$USERNAME/$ZIP_FILE" \
           -H "Authorization: Token $API_TOKEN" \
@@ -43,4 +43,4 @@ jobs:
       run: |
         curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/consoles/" \
           -H "Authorization: Token $API_TOKEN" \
-          --data "command=bash -c 'unzip -o ~/deploy.zip -d ~/ && rm ~/deploy.zip && cd ~/ && pip install -r requirements.txt && python main.py'"
+          --data "command=bash -c 'unzip -o ~/deploy.zip -d ~/ && rm ~/deploy.zip && cd ~/Data_Script/Flask && pip install -r requirements.txt && python main.py'"
