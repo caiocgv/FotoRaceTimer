@@ -22,7 +22,7 @@ def main():
         categories = []
         flag = 'false'
         Athletes = []
-        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/athletes.yaml'
+        absolute_path = '/home/vianacc/athletes.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -312,7 +312,7 @@ def export_pdf():
         with zipfile.ZipFile('results.zip', 'w') as zipf:
             for file in output:
                 zipf.write(file)
-        return send_file('/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/results.zip', as_attachment=True)
+        return send_file('/home/vianacc/results.zip', as_attachment=True)
     
 if __name__ == '__main__':
     app.run(debug=True) 
