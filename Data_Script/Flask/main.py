@@ -22,20 +22,19 @@ def main():
         categories = []
         flag = 'false'
         Athletes = []
-        try:
-            absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/athletes.yaml'
+        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/athletes.yaml'
 
-            with open(absolute_path, 'r') as file:
-                existing_data = yaml.load(file, Loader=yaml.FullLoader)
+        with open(absolute_path, 'r') as file:
+            existing_data = yaml.load(file, Loader=yaml.FullLoader)
 
+
+        if len(existing_data) > 0:
             for data in existing_data:
                 Athletes.append(racer(data))
 
             if isinstance(Athletes[0].stage, list):
                 flag = 'true'
-        
-        except:
-            pass        
+               
             
         absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
 
