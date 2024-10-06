@@ -313,7 +313,7 @@ def export_pdf():
         with zipfile.ZipFile('results.zip', 'w') as zipf:
             for file in output:
                 zipf.write(file)
-        return send_file('results.zip', as_attachment=True)
+        return send_file('/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/results.zip', as_attachment=True)
     
 if __name__ == '__main__':
     app.run(debug=True) 
