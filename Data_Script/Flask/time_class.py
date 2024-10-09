@@ -12,6 +12,8 @@ class Time:
         __str__(): Returns a string representation of the time in the format "hour:minute:second:millis".
         diff(other): Calculates the difference between two Time objects and returns a new Time object representing the difference.
         sum_up(other): Calculates the sum of two Time objects and returns a new Time object representing the sum.
+        compare(): Returns the time in milliseconds.
+        calibrate(time1, time2): Calibrates the time difference between two Time objects.
     """
 
     def __init__(self, time_str):
@@ -79,6 +81,5 @@ class Time:
     
     def calibrate(time1, time2):
         global calibration_offset
-        diff = time1.diff(time2)
-        calibration_offset = diff.compare()
-        print(f'Calibration offset: {calibration_offset}')
+        diff = time1.compare() - time2.compare()
+        calibration_offset = diff

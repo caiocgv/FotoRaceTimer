@@ -72,25 +72,6 @@
     <br>
     <hr>
 
-            <div>                
-                <form action="/results">
-                    <input type="submit" value="Ver Resultados">
-                </form>        
-                <form action="/export">
-                    <input type="submit" value="Exportar lista de atletas">
-                </form>
-                <form action="/clear">
-                    <input type="submit" value="Excluir todos os Atletas">
-                </form>
-                <form action="/category" method="POST">
-                    <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: 50%;">
-                    <input type="submit" value="Enviar">
-                </form>
-                <form action="/category" method="post">
-                    <button type="button" onclick="document.getElementById('calib').click()">Escolha o Arquivo de calibração</button>
-                    <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
-                </form>
-            </div>
         {% endif %}
     {% else %}
         {% if Athletes %}
@@ -119,27 +100,37 @@
     <br>
     <hr>
 
-            <div>
-                
-                <form action="/results">
-                    <input type="submit" value="Ver Resultados">
-                </form>        
-                <form action="/export">
-                    <input type="submit" value="Exportar lista de atletas">
-                </form>                
-                <form action="/clear">
-                    <input type="submit" value="Excluir todos os Atletas">
-                </form>
-                <form action="/category" method="POST">
-                    <input type="text" placeholder="Nova categoria" id="categoria" name="categoria">
-                    <input type="submit" value="Enviar">
-                </form>
-                <form action="/category" method="post">
-                    <button type="button" onclick="document.getElementById('calib').click()">Escolha o Arquivo de calibração</button>
-                    <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
-                </form>
-            </div>
+            
         {% endif %}
     {% endif %}
+    <div>
+                
+        <form action="/results">
+            <input type="submit" value="Ver Resultados">
+        </form>        
+        <form action="/export">
+            <input type="submit" value="Exportar lista de atletas">
+        </form>                
+        <form action="/clear">
+            <input type="submit" value="Excluir todos os Atletas">
+        </form>
+        <form action="/category" method="POST">
+            <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: max-content;">
+            <input type="submit" value="Enviar">
+        </form>
+        <form action="/category" method="POST" enctype="multipart/form-data">
+            <button type="button" onclick="document.getElementById('calib').click()">Carregue os Arquivos de calibração</button>
+            <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
+        </form>
+    </div>
+    <div>
+    {% if calib %}
+    {% if calib > 0 %}
+    <h3>A fotocélula da chegada está  {{calib}}s adiantada em relação a largada.</h3>
+    {% else %}
+    <h3>A fotocélula da chegada está {{(-1)*calib}}s atrasada em relação a largada.</h3>
+    {% endif %}
+    {% endif %}
+    </div>
 </body>
 </html>
