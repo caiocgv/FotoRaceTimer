@@ -23,6 +23,7 @@ def main():
         flag = 'false'
         Athletes = []
         absolute_path = '/home/vianacc/athletes.yaml'
+        #absolute_path = 'athletes.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -37,11 +38,21 @@ def main():
                
             
         absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
+        #absolute_path = 'categories.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
         for category in existing_data['categories']:
             categories.append(category)
+
+        try:
+            if existing_data['calib_times']:
+                Time.calibrate(Time(existing_data['calib_times'][0]), Time(existing_data['calib_times'][1]))
+                calib_times = [Time(existing_data['calib_times'][0]), Time(existing_data['calib_times'][1])]
+                diff = calib_times[0].compare() - calib_times[1].compare()
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
+        except:
+            pass
         
 
         return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
@@ -224,7 +235,6 @@ def results():
         filters = 'all'
         special = 'all'
     
-    print (render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special, flag=flag))
     return render_template('results.html', Athletes=Athletes, categories=categories, filters=filters, stage=special, flag=flag) 
 
 @app.route('/export_pdf', methods=['GET', 'POST'])
@@ -308,11 +318,59 @@ def export_pdf():
             file_title = output[len(output)-1]
             convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size, flag=flag), file_title)
 
-        print(output)
         with zipfile.ZipFile('results.zip', 'w') as zipf:
             for file in output:
                 zipf.write(file)
-        return send_file('/home/vianacc/results.zip', as_attachment=True)
+        
+        #absolute_path = 'results.zip'
+        absolute_path = '/home/vianacc/results.zip'
+        return send_file(absolute_path, as_attachment=True)
+    
+@app.route('/category', methods=['POST'])
+def update_category():
+    global categories, calib_times
+
+    new_category = request.form.get('categoria')
+    calib = request.files.getlist('calib')
+    
+    if new_category and new_category not in categories: # check if the category is already in the list
+        categories.append(new_category)
+        save_categories()
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
+    elif calib:
+        for file in calib:
+            if file.filename.rsplit('.', 1)[0].lower() in ['largada', 'chegada']:
+                string = file.read().decode('utf-8')
+                data = string.split('\r')
+
+                for i in range(len(data)):
+                    if ":" in data[i]:
+                        if file.filename.rsplit('.', 1)[0].lower() == 'largada':
+                            calib_start = Time(data[i])
+                            break
+                        elif file.filename.rsplit('.', 1)[0].lower() == 'chegada':
+                            calib_finish = Time(data[i])
+                            break
+        if calib_start and calib_finish:
+            Time.calibrate(calib_finish, calib_start)
+            calib_times = [str(calib_finish), str(calib_start)]
+            save_categories()
+            diff = calib_finish.compare() - calib_start.compare()
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
+        else:
+            return render_template('error.html', error='Invalid calibration files')
+    else:
+        return render_template('error.html', error='Invalid category name')
+    
+                        
+
+def save_categories():
+    global categories, calib_times
+    category_data = {'categories': categories,
+                     'calib_times': calib_times}
+    
+    with open('categories.yaml', 'w') as file:
+        yaml.dump(category_data, file)
     
 if __name__ == '__main__':
     app.run(debug=True) 
