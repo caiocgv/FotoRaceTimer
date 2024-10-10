@@ -8,4 +8,4 @@ bug:
 documentation:
     - '(schematic|folder|documentation)'
 flaskapp:
-    -'(app)'
+    -'(app|page)'
