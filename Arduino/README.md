@@ -8,6 +8,7 @@ This is the Arduino Based Setup.
 * Laser Diode for feeding LDR
 * SD card module for data storage
 * RTC module for time keeping
+* HC-06 for serial communication
 ## Software
 Arduino software is pretty straight forward. The passage is detected due to the variation of the resistance on the LDR and the current time is registered. Millisecond is not native and is simulated by arduino based on second change. With few commands that the user can iterate
 #### Delete
