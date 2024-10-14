@@ -4,8 +4,31 @@
     <title>{{title|default("Race Sheet")}}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        select{
+            width: 340px;
+            font-size: xx-large;
+        }
+        h1{
+            font-size: xxx-large;
+        }
+    </style>
 </head>
 <body>
+    <br>
+    {% if filters=='all' and stage=='all' and flag=='true' %}
+        <h1>Resultados - Geral - Tempo Total</h1>
+    {% elif filters=='all' and stage=='all' and flag=='false' %}
+        <h1>Resultados - Geral</h1>
+    {% elif stage == 'all' and filters != 'all' and flag == 'true' %}
+        <h1>Resultados - Categoria: {{ filters }} - Tempo Geral</h1>
+    {% elif stage == 'all' and filters != 'all' and flag == 'false' %}
+        <h1>Resultados - Categoria: {{ filters }}</h1>
+    {% elif filters == 'all' and stage != 'all' %}
+        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
+    {% else %}
+        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
+    {% endif %}
         <form method="POST">
             <select name="category" id="category">
                 <option value="all">Selecionar Categoria</option>
@@ -17,8 +40,8 @@
 
         {% if flag == 'true' %}
             <select name="stage" id="stage">
-                <option value="all">Select Stage</option>
-                <option value="all">All Stages</option>
+                <option value="all">Selecionar Especial</option>
+                <option value="all">Geral</option>
                 {% for stage in Athletes[0].stage %}
                     <option value="{{ stage }}">{{ stage }}</option>
                 {% endfor %}
@@ -35,21 +58,9 @@
             <input type="submit" value="Imprimir Resultados" formaction="/export_pdf">
         </form>
         
-    {% if filters=='all' and stage=='all' and flag=='true' %}
-        <h1>Resultados - Geral - Tempo Total</h1>
-    {% elif filters=='all' and stage=='all' and flag=='false' %}
-        <h1>Resultados - Geral</h1>
-    {% elif stage == 'all' and filters != 'all' and flag == 'true' %}
-        <h1>Resultados - Categoria: {{ filters }} - Tempo Geral</h1>
-    {% elif stage == 'all' and filters != 'all' and flag == 'false' %}
-        <h1>Resultados - Categoria: {{ filters }}</h1>
-    {% elif filters == 'all' and stage != 'all' %}
-        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
-    {% else %}
-        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
-    {% endif %}
     
-    <table>
+    
+    <table style="font-size: xx-large;">
         {% if flag == 'true' %}
         <tr>
             <th style="width: 40px;">Pos</th>

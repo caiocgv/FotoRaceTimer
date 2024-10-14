@@ -4,25 +4,47 @@
     <title>{{title|default("Race Sheet")}}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        h1{
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+    <br>
     <h1>Registrar Atletas</h1>
-    <form action="/" method="POST">
-        <select id="category" name="info">
-            {% for category in categories %}
-                <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" id="name" name="info" placeholder="Nome" required>
-        <input type="number" id="number" name="info" placeholder="Número">
-        
-        <input type="submit" value="Enviar">
-    </form> 
+    <div> 
+        <form action="/" method="POST">
+            <select id="category" name="info" style="width: max-content;">
+                <option value="" >Selecionar Categoria</option>
+                {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="name" name="info" placeholder="Nome" required>
+            <input type="number" id="number" name="info" placeholder="Número">
+            
+            <input type="submit" value="Enviar">
+        </form> 
+    </div>
+    <br>
+    <div>
+        <div style="width: 350px">
+        <form action="/category" method="POST">
+            <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" onchange="form.submit()">
+        </form>
+        <form action="/category" method="POST" enctype="multipart/form-data">
+            <button type="button" onclick="document.getElementById('calib').click()">Calibrar</button>
+            <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
+        </form>
+        </div>
+    </div>
 
     <br>
     <hr>
 
     <h1>Importar Arquivos</h1>
+    <div>
     <form action="/import" method="POST" enctype="multipart/form-data">
         <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
         <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' multiple onchange="form.submit()">
@@ -33,7 +55,7 @@
             <label for="flag">Enduro</label>
         {% endif %}
     </form>
-    
+    </div>
     <br>
     <hr>
 
@@ -112,15 +134,7 @@
             <input type="submit" value="Exportar lista de atletas">
         </form>                
         <form action="/clear">
-            <input type="submit" value="Excluir todos os Atletas">
-        </form>
-        <form action="/category" method="POST">
-            <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: max-content;">
-            <input type="submit" value="Enviar">
-        </form>
-        <form action="/category" method="POST" enctype="multipart/form-data">
-            <button type="button" onclick="document.getElementById('calib').click()">Carregue os Arquivos de calibração</button>
-            <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
+            <input type="submit" value="Iniciar nova corrida">
         </form>
     </div>
     <div>
