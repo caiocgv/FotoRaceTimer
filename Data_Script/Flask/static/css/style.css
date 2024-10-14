@@ -10,6 +10,7 @@ div {
     display: flex;  
     width: 100%;
     justify-content: space-evenly;
+    align-items: center;
 }
 
 /* Style tables */
@@ -44,10 +45,11 @@ select,
 input[type="text"],
 input[type="number"],
 input[type="email"] {
-    width: 10%;
+    width: 200px;
     padding: 10px;
     border: 1px solid #555;
     border-radius: 4px;
+    font-size: x-large;
 }
 
 /* Style buttons */
@@ -59,6 +61,7 @@ button{
     background-color: #555;
     color: aliceblue;
     margin: 10px;
+    font-size: x-large;
 }
 
 input[type="submit"]:hover,

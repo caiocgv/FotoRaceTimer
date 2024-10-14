@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    global Athletes, categories, flag
+    global Athletes, categories, flag, calib_times
 
     if request.method == 'POST':
         Athletes.append(racer(request.form.getlist('info'))) if request.form.getlist('info')[1] != "" else None
@@ -20,10 +20,11 @@ def main():
     else:
         
         categories = []
+        calib_times = []
         flag = 'false'
         Athletes = []
-        absolute_path = '/home/vianacc/athletes.yaml'
-        #absolute_path = 'athletes.yaml'
+        # absolute_path = '/home/vianacc/athletes.yaml'
+        absolute_path = 'athletes.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -37,13 +38,16 @@ def main():
                 flag = 'true'
                
             
-        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
-        #absolute_path = 'categories.yaml'
+        # absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
+        absolute_path = 'categories.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
-        for category in existing_data['categories']:
-            categories.append(category)
+        try:
+            for category in existing_data['categories']:
+                categories.append(category)
+        except:
+            pass
 
         try:
             if existing_data['calib_times']:
@@ -59,14 +63,14 @@ def main():
 
 @app.route('/clear')
 def clear():
-    global Athletes
+    global Athletes, categories
     Athletes = []
     save()
     return render_template('index.html', Athletes=Athletes, categories=categories)
 
 @app.route('/save')
 def save():
-    global Athletes
+    global Athletes, categories, flag
     athlete_data = [athlete.to_dict() for athlete in Athletes]
     with open('athletes.yaml', 'w') as file:
         yaml.dump(athlete_data, file)
@@ -95,7 +99,7 @@ def upload():
     """
 
     
-    global Athletes, flag
+    global Athletes, flag, categories
     max_stage = 0
 
     file = request.files.getlist('file')
@@ -333,41 +337,46 @@ def update_category():
     new_category = request.form.get('categoria')
     calib = request.files.getlist('calib')
     
-    if new_category and new_category not in categories: # check if the category is already in the list
-        categories.append(new_category)
-        save_categories()
-        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
-    elif calib:
-        for file in calib:
-            if file.filename.rsplit('.', 1)[0].lower() in ['largada', 'chegada']:
-                string = file.read().decode('utf-8')
-                data = string.split('\r')
-
-                for i in range(len(data)):
-                    if ":" in data[i]:
-                        if file.filename.rsplit('.', 1)[0].lower() == 'largada':
-                            calib_start = Time(data[i])
-                            break
-                        elif file.filename.rsplit('.', 1)[0].lower() == 'chegada':
-                            calib_finish = Time(data[i])
-                            break
-        if calib_start and calib_finish:
-            Time.calibrate(calib_finish, calib_start)
-            calib_times = [str(calib_finish), str(calib_start)]
+    if new_category:
+        if new_category not in categories: # check if the category is already in the list
+            categories.append(new_category)
             save_categories()
-            diff = calib_finish.compare() - calib_start.compare()
-            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
         else:
-            return render_template('error.html', error='Invalid calibration files')
+            return render_template('error.html', error='Categoria já cadastrada')
     else:
-        return render_template('error.html', error='Invalid category name')
+        if calib and calib[0].filename.rsplit('.', 1)[1].lower() == 'txt':
+            for file in calib:
+                if file.filename.rsplit('.', 1)[0].lower() in ['largada', 'chegada']:
+                    string = file.read().decode('utf-8')
+                    data = string.split('\r')
+
+                    for i in range(len(data)):
+                        if ":" in data[i]:
+                            if file.filename.rsplit('.', 1)[0].lower() == 'largada':
+                                calib_start = Time(data[i])
+                                break
+                            elif file.filename.rsplit('.', 1)[0].lower() == 'chegada':
+                                calib_finish = Time(data[i])
+                                break
+            if calib_start and calib_finish:
+                Time.calibrate(calib_finish, calib_start)
+                calib_times = [str(calib_finish), str(calib_start)]
+                save_categories()
+                diff = calib_finish.compare() - calib_start.compare()
+                return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
+            else:
+                return render_template('error.html', error='Arquivos de calibração inválido')
+        else:
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
     
                         
 
 def save_categories():
     global categories, calib_times
+    
     category_data = {'categories': categories,
-                     'calib_times': calib_times}
+                     'calib_times': [str(calib) for calib in calib_times]}
     
     with open('categories.yaml', 'w') as file:
         yaml.dump(category_data, file)

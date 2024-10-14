@@ -7,17 +7,27 @@
 </head>
 <body>
     <h1>Registrar Atletas</h1>
-    <form action="/" method="POST">
-        <select id="category" name="info">
-            {% for category in categories %}
-                <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" id="name" name="info" placeholder="Nome" required>
-        <input type="number" id="number" name="info" placeholder="Número">
-        
-        <input type="submit" value="Enviar">
-    </form> 
+    <div> 
+        <form action="/" method="POST">
+            <select id="category" name="info">
+                {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="name" name="info" placeholder="Nome" required>
+            <input type="number" id="number" name="info" placeholder="Número">
+            
+            <input type="submit" value="Enviar">
+        </form> 
+           
+        <form action="/category" method="POST">
+            <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" onchange="form.submit()">
+        </form>
+        <form action="/category" method="POST" enctype="multipart/form-data">
+            <button type="button" onclick="document.getElementById('calib').click()">Calibrar</button>
+            <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
+        </form>
+    </div>
 
     <br>
     <hr>
@@ -112,15 +122,7 @@
             <input type="submit" value="Exportar lista de atletas">
         </form>                
         <form action="/clear">
-            <input type="submit" value="Excluir todos os Atletas">
-        </form>
-        <form action="/category" method="POST">
-            <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" style="width: max-content;">
-            <input type="submit" value="Enviar">
-        </form>
-        <form action="/category" method="POST" enctype="multipart/form-data">
-            <button type="button" onclick="document.getElementById('calib').click()">Carregue os Arquivos de calibração</button>
-            <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
+            <input type="submit" value="Iniciar nova corrida">
         </form>
     </div>
     <div>
