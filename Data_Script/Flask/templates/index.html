@@ -44,6 +44,7 @@
     <hr>
 
     <h1>Importar Arquivos</h1>
+    <div>
     <form action="/import" method="POST" enctype="multipart/form-data">
         <button type="button" onclick="document.getElementById('files').click()">Escolha o Arquivo</button>
         <input style="display: none;" id="files" type='file' accept='.yaml, .txt' name='file' multiple onchange="form.submit()">
@@ -54,7 +55,7 @@
             <label for="flag">Enduro</label>
         {% endif %}
     </form>
-    
+    </div>
     <br>
     <hr>
 
