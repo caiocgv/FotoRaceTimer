@@ -4,12 +4,19 @@
     <title>{{title|default("Race Sheet")}}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        h1{
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+    <br>
     <h1>Registrar Atletas</h1>
     <div> 
         <form action="/" method="POST">
-            <select id="category" name="info">
+            <select id="category" name="info" style="width: max-content;">
+                <option value="" >Selecionar Categoria</option>
                 {% for category in categories %}
                     <option value="{{ category }}">{{ category }}</option>
                 {% endfor %}
@@ -19,7 +26,10 @@
             
             <input type="submit" value="Enviar">
         </form> 
-           
+    </div>
+    <br>
+    <div>
+        <div style="width: 350px">
         <form action="/category" method="POST">
             <input type="text" placeholder="Nova categoria" id="categoria" name="categoria" onchange="form.submit()">
         </form>
@@ -27,6 +37,7 @@
             <button type="button" onclick="document.getElementById('calib').click()">Calibrar</button>
             <input style="display: none;" id="calib" type='file' accept='.txt' name='calib' multiple onchange="form.submit()">
         </form>
+        </div>
     </div>
 
     <br>

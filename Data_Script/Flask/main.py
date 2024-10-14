@@ -54,7 +54,8 @@ def main():
                 Time.calibrate(Time(existing_data['calib_times'][0]), Time(existing_data['calib_times'][1]))
                 calib_times = [Time(existing_data['calib_times'][0]), Time(existing_data['calib_times'][1])]
                 diff = calib_times[0].compare() - calib_times[1].compare()
-            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
+                calib_times.append(diff/1000)
+            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
         except:
             pass
         
@@ -341,7 +342,10 @@ def update_category():
         if new_category not in categories: # check if the category is already in the list
             categories.append(new_category)
             save_categories()
-            return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
+            if calib_times:
+                return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
+            else:
+                return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
         else:
             return render_template('error.html', error='Categoria já cadastrada')
     else:

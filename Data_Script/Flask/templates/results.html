@@ -15,6 +15,20 @@
     </style>
 </head>
 <body>
+    <br>
+    {% if filters=='all' and stage=='all' and flag=='true' %}
+        <h1>Resultados - Geral - Tempo Total</h1>
+    {% elif filters=='all' and stage=='all' and flag=='false' %}
+        <h1>Resultados - Geral</h1>
+    {% elif stage == 'all' and filters != 'all' and flag == 'true' %}
+        <h1>Resultados - Categoria: {{ filters }} - Tempo Geral</h1>
+    {% elif stage == 'all' and filters != 'all' and flag == 'false' %}
+        <h1>Resultados - Categoria: {{ filters }}</h1>
+    {% elif filters == 'all' and stage != 'all' %}
+        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
+    {% else %}
+        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
+    {% endif %}
         <form method="POST">
             <select name="category" id="category">
                 <option value="all">Selecionar Categoria</option>
@@ -44,21 +58,9 @@
             <input type="submit" value="Imprimir Resultados" formaction="/export_pdf">
         </form>
         
-    {% if filters=='all' and stage=='all' and flag=='true' %}
-        <h1>Resultados - Geral - Tempo Total</h1>
-    {% elif filters=='all' and stage=='all' and flag=='false' %}
-        <h1>Resultados - Geral</h1>
-    {% elif stage == 'all' and filters != 'all' and flag == 'true' %}
-        <h1>Resultados - Categoria: {{ filters }} - Tempo Geral</h1>
-    {% elif stage == 'all' and filters != 'all' and flag == 'false' %}
-        <h1>Resultados - Categoria: {{ filters }}</h1>
-    {% elif filters == 'all' and stage != 'all' %}
-        <h1>Resultados - Geral - Especial: {{ stage }}</h1>
-    {% else %}
-        <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
-    {% endif %}
     
-    <table style="font-size: xxx-large;">
+    
+    <table style="font-size: xx-large;">
         {% if flag == 'true' %}
         <tr>
             <th style="width: 40px;">Pos</th>
