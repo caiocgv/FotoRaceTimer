@@ -14,6 +14,7 @@ Next evolution of fotocell, wifi capable for data handling and calibration.
 ## Bill of Materials
 * NodeMCU ESP8266 12E
 * LDR
+* 10k pull down resistor
 * LASER LED
 * 18650 🔋 
 * CHARGER MODULE
