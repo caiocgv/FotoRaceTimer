@@ -20,7 +20,12 @@ void setup(){
   dnsS.start(DNS_PORT, "*", WiFi.softAPIP()); // Start the DNS server
 
   server.on("/", [](){
-    server.send(200, "text/html", "<h1>Hello World</h1>");
+    String text = "Uptime: " + String(millis()/1000) + " seconds";
+    server.send(200, "text/html", "<meta http-equiv='refresh' content='2'>"  // Refresh the page every 2 seconds
+                                  "<h1>"
+                                      + text +                               // Display the uptime, variable text can be added here
+                                  "</h1>"
+                                  );
   });
   server.begin(); // Start the server
 }
