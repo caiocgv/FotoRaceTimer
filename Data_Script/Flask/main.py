@@ -23,8 +23,8 @@ def main():
         calib_times = []
         flag = 'false'
         Athletes = []
-        #absolute_path = '/home/vianacc/athletes.yaml'
-        absolute_path = 'athletes.yaml'
+        absolute_path = '/home/vianacc/athletes.yaml'
+        #absolute_path = 'athletes.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -38,8 +38,8 @@ def main():
                 flag = 'true'
                
             
-        #absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
-        absolute_path = 'categories.yaml'
+        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
+        #absolute_path = 'categories.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -321,8 +321,8 @@ def export_pdf():
             for file in output:
                 zipf.write(file)
         
-        absolute_path = 'results.zip'
-        #absolute_path = '/home/vianacc/results.zip'
+        #absolute_path = 'results.zip'
+        absolute_path = '/home/vianacc/results.zip'
         return send_file(absolute_path, as_attachment=True)
     
 @app.route('/category', methods=['POST'])
