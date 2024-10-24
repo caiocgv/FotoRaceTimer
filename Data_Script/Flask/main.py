@@ -15,7 +15,7 @@ def main():
         Athletes.append(racer(request.form.getlist('info'))) if request.form.getlist('info')[1] != "" else None
         flag = 'false'
         save()
-        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
+        return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
     
     else:
         
@@ -23,8 +23,8 @@ def main():
         calib_times = []
         flag = 'false'
         Athletes = []
-        absolute_path = '/home/vianacc/athletes.yaml'
-        #absolute_path = 'athletes.yaml'
+        #absolute_path = '/home/vianacc/athletes.yaml'
+        absolute_path = 'athletes.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -38,8 +38,8 @@ def main():
                 flag = 'true'
                
             
-        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
-        #absolute_path = 'categories.yaml'
+        #absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
+        absolute_path = 'categories.yaml'
 
         with open(absolute_path, 'r') as file:
             existing_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -64,10 +64,11 @@ def main():
 
 @app.route('/clear')
 def clear():
-    global Athletes, categories
+    global Athletes, categories, calib_times, flag
     Athletes = []
+    flag = 'false'
     save()
-    return render_template('index.html', Athletes=Athletes, categories=categories)
+    return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
 
 @app.route('/save')
 def save():
@@ -75,13 +76,6 @@ def save():
     athlete_data = [athlete.to_dict() for athlete in Athletes]
     with open('athletes.yaml', 'w') as file:
         yaml.dump(athlete_data, file)
-
-    if len(Athletes)>0 and isinstance(Athletes[0].stage, list):
-        flag = 'true'
-    else:
-        flag = 'false'
-    
-    return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag)
 
 @app.route('/export') 
 def download(): 
@@ -327,8 +321,8 @@ def export_pdf():
             for file in output:
                 zipf.write(file)
         
-        #absolute_path = 'results.zip'
-        absolute_path = '/home/vianacc/results.zip'
+        absolute_path = 'results.zip'
+        #absolute_path = '/home/vianacc/results.zip'
         return send_file(absolute_path, as_attachment=True)
     
 @app.route('/category', methods=['POST'])
@@ -367,7 +361,8 @@ def update_category():
                 Time.calibrate(calib_finish, calib_start)
                 calib_times = [str(calib_finish), str(calib_start)]
                 save_categories()
-                diff = calib_finish.compare() - calib_start.compare()
+                diff = calib_finish.compare() - calib_start.compare() # get time difference in millis, avoid compensation of 'diff' method
+                calib_times.append(diff/1000)
                 return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = diff/1000)
             else:
                 return render_template('error.html', error='Arquivos de calibração inválido')

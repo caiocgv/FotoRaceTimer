@@ -54,7 +54,16 @@ class Time:
         global calibration_offset
         self_millis = self.hour*3600000 + self.minute*60000 + self.second*1000 + self.millis
         other_millis = other.hour*3600000 + other.minute*60000 + other.second*1000 + other.millis
-        diff = self_millis - other_millis + calibration_offset # correction factor for RTC desync
+
+        # Check which time is greater and calculate the difference compensating for RTC desync
+        # according to the calibration offset
+        if self.compare() > other.compare():
+            diff = self_millis - other_millis + calibration_offset # correction factor for RTC desync
+            print('normal')
+        else:
+            diff = other_millis - self_millis - calibration_offset # correction factor for RTC desync
+            print('reverse')
+
         hour = diff // 3600000
         diff = diff % 3600000
         minute = diff // 60000
