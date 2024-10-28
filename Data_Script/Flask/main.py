@@ -23,12 +23,15 @@ def main():
         calib_times = []
         flag = 'false'
         Athletes = []
-        absolute_path = '/home/vianacc/athletes.yaml'
-        #absolute_path = 'athletes.yaml'
-
-        with open(absolute_path, 'r') as file:
-            existing_data = yaml.load(file, Loader=yaml.FullLoader)
-
+        
+        try:
+            absolute_path = 'athletes.yaml'
+            with open(absolute_path, 'r') as file:
+                existing_data = yaml.load(file, Loader=yaml.FullLoader)
+        except:
+            absolute_path = '/home/vianacc/athletes.yaml'
+            with open(absolute_path, 'r') as file:
+                existing_data = yaml.load(file, Loader=yaml.FullLoader)
 
         if len(existing_data) > 0:
             for data in existing_data:
@@ -38,11 +41,16 @@ def main():
                 flag = 'true'
                
             
-        absolute_path = '/home/vianacc/mysite/FotoRaceTimer/Data_Script/Flask/categories.yaml'
-        #absolute_path = 'categories.yaml'
+        
+        try: # load categories and calibration times from relative path
+            absolute_path = 'categories.yaml'
+            with open(absolute_path, 'r') as file:
+                existing_data = yaml.load(file, Loader=yaml.FullLoader)
+        except: # load categories and calibration times from absolute path
+            absolute_path = '/home/vianacc/categories.yaml'
+            with open(absolute_path, 'r') as file:
+                existing_data = yaml.load(file, Loader=yaml.FullLoader)
 
-        with open(absolute_path, 'r') as file:
-            existing_data = yaml.load(file, Loader=yaml.FullLoader)
         try:
             for category in existing_data['categories']:
                 categories.append(category)
@@ -242,6 +250,7 @@ def export_pdf():
     if request.method == 'POST':
         if flag == 'true':
             output = []
+            output_html = ''
             for special in Athletes[0].stage:
                 for filters in categories: # loop through all categories to export especific results for each category in each stage
                     Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
@@ -257,7 +266,8 @@ def export_pdf():
                     
                     file_title = output[len(output)-1]
                     convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=file_title[:-4], size=size), file_title)
-
+                    output_html += render_template('export_results.html', Athletes=Athletes, filters=filters, stage=special, output=file_title[:-4], size=size)
+            
             for special in Athletes[0].stage: # loop through all stages to export the general results for each stage
                 Athletes.sort(key=lambda x: x.time[x.stage.index(special)].compare())
                     
@@ -269,6 +279,7 @@ def export_pdf():
                 
                 file_title = output[len(output)-1]
                 convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage=special, output=file_title[:-4], size=size), file_title)
+                output_html += render_template('export_results.html', Athletes=Athletes, filters='all', stage=special, output=file_title[:-4], size=size)
 
             for filters in categories: # loop through all categories to export the general results for each category
                 Athletes.sort(key=lambda x: x.totTime[-1].compare())
@@ -283,15 +294,18 @@ def export_pdf():
 
                 file_title = output[len(output)-1]
 
-                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size), file_title)
-            
+                convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size, flag=flag), file_title)
+                output_html += render_template('export_results.html', Athletes=Athletes, filters=filters, stage='all', output=file_title[:-4], size=size, flag=flag)
+
             # export the general results for all categories
             size = len([athlete for athlete in Athletes])
             output.append('Resultado Geral.pdf')
             size = '58mm ' + str(size*6+30) + 'mm'
 
             file_title = output[len(output)-1]
-            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size), file_title)
+            convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size, flag=flag), file_title)
+            output_html += render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size, flag=flag)
+            # return output_html
         
         else:
             output = []
@@ -316,14 +330,17 @@ def export_pdf():
 
             file_title = output[len(output)-1]
             convert_html_to_pdf(render_template('export_results.html', Athletes=Athletes, filters='all', stage='all', output=file_title[:-4], size=size, flag=flag), file_title)
-
+            
         with zipfile.ZipFile('results.zip', 'w') as zipf:
             for file in output:
                 zipf.write(file)
         
-        #absolute_path = 'results.zip'
-        absolute_path = '/home/vianacc/results.zip'
-        return send_file(absolute_path, as_attachment=True)
+        try:
+            absolute_path = 'results.zip'
+            return send_file(absolute_path, as_attachment=True)
+        except:
+            absolute_path = '/home/vianacc/results.zip'
+            return send_file(absolute_path, as_attachment=True)
     
 @app.route('/category', methods=['POST'])
 def update_category():
