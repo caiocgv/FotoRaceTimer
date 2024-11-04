@@ -29,7 +29,7 @@
     {% else %}
         <h1>Resultados - Categoria: {{ filters }} - Especial: {{ stage }}</h1>
     {% endif %}
-        <form method="POST">
+        <form method="POST" action="/results">
             <select name="category" id="category">
                 <option value="all">Selecionar Categoria</option>
                 <option value="all">Geral</option>
@@ -41,12 +41,12 @@
         {% if flag == 'true' %}
             <select name="stage" id="stage">
                 <option value="all">Selecionar Especial</option>
-                <option value="all">Geral</option>
+                <option value="all">Total</option>
                 {% for stage in Athletes[0].stage %}
                     <option value="{{ stage }}">{{ stage }}</option>
                 {% endfor %}
             </select>
-
+            <button type="submit">Filtrar</button>
         {% else %}
             <input type="checkbox" id="stage" name="stage" value="all" checked style="display: none;">
 
@@ -115,7 +115,12 @@
         {% endfor %}
         {% endif %}
     </table>
-    <button onclick="window.location.href='/'">Retornar</button>
+    <div style="width: 100px;">
+        <button onclick="window.location.href='/'">Retornar</button>
+        <form action="/special_results" method="post">
+            <input style="width: 540px;" type="text" name="specialResults" id="specialResults" placeholder="Digite o número dos estágios que deseja somar" onchange="this.form.submit()">
+        </form>
+    </div>
 </body>
 </html>
 <script>

@@ -59,10 +59,9 @@ class Time:
         # according to the calibration offset
         if self.compare() > other.compare():
             diff = self_millis - other_millis + calibration_offset # correction factor for RTC desync
-            print('normal')
+            
         else:
             diff = other_millis - self_millis - calibration_offset # correction factor for RTC desync
-            print('reverse')
 
         hour = diff // 3600000
         diff = diff % 3600000
@@ -92,3 +91,18 @@ class Time:
         global calibration_offset
         diff = time1.compare() - time2.compare()
         calibration_offset = diff
+
+def is_time(time_str):
+    """
+    Checks if the given time string is valid.
+    Parameters:
+    time_str (str): The time string to be checked.
+    Returns:
+    bool: True if the time string is valid, False otherwise.
+    """
+
+    try:
+        Time(time_str)
+        return True
+    except:
+        return False
