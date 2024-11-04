@@ -448,7 +448,7 @@ def special_results():
             athlete.stage.append(specialResults)    # add the new stage sommatory to the list
             athlete.time.append(newTottime)         # add the new stage sommatory to the list        
 
-        return render_template('results.html', Athletes=Athletes, categories=categories, filters='all', stage='all', flag=flag)
+        return render_template('results.html', Athletes=Athletes, categories=categories, filters='all', stage=specialResults, flag=flag)
 
 
 
