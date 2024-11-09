@@ -42,7 +42,6 @@ def main():
                 flag = 'true'
 
 
-
         try: # load categories and calibration times from relative path
             absolute_path = 'categories.yaml'
             with open(absolute_path, 'r') as file:
@@ -81,7 +80,6 @@ def clear():
     save_categories()
     return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
 
-@app.route('/save')
 def save():
     global Athletes, categories, flag
     athlete_data = [athlete.to_dict() for athlete in Athletes]
@@ -449,6 +447,26 @@ def special_results():
             athlete.time.append(newTottime)         # add the new stage sommatory to the list        
 
         return render_template('results.html', Athletes=Athletes, categories=categories, filters='all', stage=specialResults, flag=flag)
+
+@app.route('/edit_info/<id>', methods=['GET', 'POST'])
+def edit_info(id):
+        global Athletes, categories, flag, calib_times
+
+        if request.method == 'POST':
+            athlete = next((athlete for athlete in Athletes if athlete.number == id), None)
+            if athlete:
+                athlete.update_info(request.form.getlist('info'))
+                save()
+                return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
+            
+        else:
+                athlete = next((athlete for athlete in Athletes if athlete.number == id), None)
+                if athlete:
+                    return render_template('edit_info.html', athlete=athlete, categories=categories, flag=flag, title='Editar Atleta')
+                else:
+                    return render_template('error.html', error='Athlete not found')
+        
+
 
 
 

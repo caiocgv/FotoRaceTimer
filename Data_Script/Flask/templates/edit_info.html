@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title|default("Race Sheet")}}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        h1, h2{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Editar dados de {{athlete.name}}</h1>
+    
+    <form action="/edit_info/{{ athlete.number }}" method="POST" id="form">
+        
+        <div>
+        {% if flag == 'true' %}
+        <table>
+        <tr>
+            <th>Categoria</th>
+            <th>Nome</th>
+            <th>Número</th>
+            <th>N°E</th>
+            <th>Largada</th>
+            <th>Chegada</th>
+        </tr>
+        <tr>
+            <td rowspan="{{athlete.stage | length + 1}}">
+                <select name="info" id="info">
+                    <option value="{{ athlete.category }}" selected>{{ athlete.category }}</option>
+                    {% for category in categories %}
+                        {% if category != athlete.category %}
+                            <option value="{{ category }}">{{ category }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+            <td rowspan="{{athlete.stage | length + 1}}"><input type="text" id="info" name="info" value={{athlete.name}}></td>
+            <!-- <td rowspan="{{athlete.stage | length + 1}}"><input type="number" id="info" name="info" value={{athlete.number}} style="width: 50px;"></td> -->
+            <td rowspan="{{athlete.stage | length + 1}}"><input type="number" name="info" id="info" value="{{athlete.number}}"></td>
+        </tr>
+        {% for stage in athlete.stage %}
+        <tr>
+            <td><input type="number" id="info" name="info" value={{stage}} style="width: 50px;"></td>
+            <td><input type="text" id="info" name="info" value={{athlete.start[loop.index0]}}></td>
+            <td><input type="text" id="info" name="info" value={{athlete.finish[loop.index0]}}></td>
+        </tr>
+        {% endfor %}
+        </table>
+        {% else %}
+        <h1>on construction</h1>
+        {% endif %}
+        </div>
+
+    </form>
+
+    
+    <div>
+        <button onclick="window.location.href='/'">Retornar</button>
+
+        <button type="submit" form="form">Atualizar</button>
+
+        <button onclick="window.location.href='/'">Excluir</button>
+    </div>
+</body>
+</html>
