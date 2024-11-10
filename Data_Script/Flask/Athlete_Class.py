@@ -84,6 +84,24 @@ class racer:
                 self.time = self.finish.diff(self.start)
 
     def update_info(self, data):
+        """
+        Updates the information of the athlete based on the provided data.
+        Parameters:
+        - data (list): A list containing the updated information of the athlete. The list should have the following structure:
+            - data[0] (str): The category of the athlete.
+            - data[1] (str): The name of the athlete.
+            - data[2] (int): The number of the athlete.
+            - data[3:] (varies): Additional data for each stage of the athlete. The number of elements in this part should be a multiple of 3, where each group of 3 elements represents the stage, start time, and finish time of a particular stage.
+        Returns:
+        - None
+        Note:
+        - If the athlete has stages already defined, the existing stages will be updated with the provided data.
+        - If the athlete does not have any stages defined, the start and finish times will be updated directly.
+        Example usage:
+        athlete = Athlete()
+        athlete.update_info(['Category A', 'John Doe', 1, 'Stage 1', '10:00:00', '11:00:00', 'Stage 2', '12:00:00', '13:00:00'])
+        """
+
         if self.stage != []:
 
             self.category = data[0]
@@ -101,4 +119,11 @@ class racer:
                 self.finish[i] = Time(data[j])
                 print(data[j])
                 j+=1
+        else:
+            self.category = data[0]
+            self.name = data[1]
+            self.number = data[2]
+            self.start = Time(data[3])
+            self.finish = Time(data[4])
+        
         self.calculate_time()

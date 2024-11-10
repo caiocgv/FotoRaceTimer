@@ -50,7 +50,29 @@
         {% endfor %}
         </table>
         {% else %}
-        <h1>on construction</h1>
+        <table>
+        <tr>
+            <th>Categoria</th>
+            <th>Nome</th>
+            <th>Número</th>
+            <th>Largada</th>
+            <th>Chegada</th>
+        </tr>
+        <tr>
+            <td><select name="info" id="info">
+                <option value="{{ athlete.category }}" selected>{{ athlete.category }}</option>
+                {% for category in categories %}
+                    {% if category != athlete.category %}
+                        <option value="{{ category }}">{{ category }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select></td>
+            <td><input type="text" id="info" name="info" value={{athlete.name}}></td>
+            <td><input type="number" name="info" id="info" value="{{athlete.number}}"></td>
+            <td><input type="text" id="info" name="info" value={{athlete.start}}></td>
+            <td><input type="text" id="info" name="info" value={{athlete.finish}}></td>
+        </tr>
+        </table>
         {% endif %}
         </div>
 
