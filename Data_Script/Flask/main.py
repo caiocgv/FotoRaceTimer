@@ -444,7 +444,9 @@ def special_results():
                     newTottime = newTottime.add(athlete.time[sIndex[i]])
 
             athlete.stage.append(specialResults)    # add the new stage sommatory to the list
-            athlete.time.append(newTottime)         # add the new stage sommatory to the list        
+            athlete.time.append(newTottime)         # add the new stage sommatory to the list  
+
+        Athletes.sort(key=lambda x: x.time[x.stage.index(specialResults)].compare())
 
         return render_template('results.html', Athletes=Athletes, categories=categories, filters='all', stage=specialResults, flag=flag)
 
