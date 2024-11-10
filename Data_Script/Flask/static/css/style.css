@@ -24,12 +24,15 @@ table th {
     background-color: #555;
     color: aliceblue;
     border-radius: 4px;
+    font-size: xx-large;
 }
 
 table td {
     padding: 10px;
+    text-align: center;
     border: 1px solid #555;
     border-radius: 4px;
+    font-size: x-large;
 }
 
 table tr:nth-child(odd) td {
@@ -46,15 +49,17 @@ input[type="text"],
 input[type="number"],
 input[type="email"] {
     width: 200px;
-    padding: 10px;
+    padding: 1px;
     border: 1px solid #555;
     border-radius: 4px;
     font-size: x-large;
+    text-align: center;
+
 }
 
 /* Style buttons */
 input[type="submit"],
-button{
+button, a{
     padding: 10px;
     border: 1px solid #555;
     border-radius: 4px;
@@ -62,10 +67,12 @@ button{
     color: aliceblue;
     margin: 10px;
     font-size: x-large;
+    text-decoration: none;
 }
 
 input[type="submit"]:hover,
-button:hover {
+button:hover,
+a:hover {
     background-color: white;
     color: #555;
 }

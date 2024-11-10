@@ -5,7 +5,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        h1{
+        h1, h2{
             text-align: center;
         }
     </style>
@@ -28,6 +28,7 @@
         </form> 
     </div>
     <br>
+    <h1>Configurar</h1>
     <div>
         <div style="width: 350px">
         <form action="/category" method="POST">
@@ -62,6 +63,7 @@
     {% if flag == 'true' %}
         {% if Athletes %}
             <h1>Atletas Inscritos</h1>
+            <h2>Clique no nome do atleta para editar as informações</h2>
             <table>
                 <tr>
                     <th>Categoria</th>
@@ -76,7 +78,7 @@
                 {% for athlete in Athletes %}
                     <tr>
                         <td rowspan="{{athlete.stage | length + 1}}">{{ athlete.category }}</td>
-                        <td rowspan="{{athlete.stage | length + 1}}">{{ athlete.name     }}</td>
+                        <td rowspan="{{athlete.stage | length + 1}}"><a href="/edit_info/{{ athlete.number }}">{{ athlete.name }}</a></td>
                         <td rowspan="{{athlete.stage | length + 1}}">{{ athlete.number   }}</td>
                     </tr>
                     {% for stage in athlete.stage %}
@@ -108,9 +110,9 @@
                     <th>Tempo</th>
                 </tr>
                 {% for athlete in Athletes %}
-                <tr>
+                <tr onclick="window.location.href='/edit_info/{{ athlete.id }}'"></tr>
                     <td>{{ athlete.category }}</td>
-                    <td>{{ athlete.name     }}</td>
+                    <td style="text-decoration: underline;">{{ athlete.name     }}</td>
                     <td>{{ athlete.number   }}</td>
                     <td>{{ athlete.start    }}</td>
                     <td>{{ athlete.finish   }}</td>

@@ -82,3 +82,23 @@ class racer:
         else:
             if str(self.start).split(':')[0] != '00' and str(self.finish).split(':')[0] != '00':
                 self.time = self.finish.diff(self.start)
+
+    def update_info(self, data):
+        if self.stage != []:
+
+            self.category = data[0]
+            self.name = data[1]
+            self.number = data[2]
+            print(data)
+            j=3
+            for i in range(len(self.stage)):
+                self.stage[i] = data[j]
+                print(data[j])
+                j+=1
+                self.start[i] = Time(data[j])
+                print(data[j])
+                j+=1
+                self.finish[i] = Time(data[j])
+                print(data[j])
+                j+=1
+        self.calculate_time()
