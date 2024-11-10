@@ -115,11 +115,15 @@
         {% endfor %}
         {% endif %}
     </table>
+
     <div style="width: 100px;">
         <button onclick="window.location.href='/'">Retornar</button>
+
+        {% if flag == 'true' %}
         <form action="/special_results" method="post">
             <input style="width: 540px;" type="text" name="specialResults" id="specialResults" placeholder="Digite o número das especiais que deseja somar" onchange="this.form.submit()">
         </form>
+        {% endif %}
     </div>
 </body>
 </html>
