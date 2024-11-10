@@ -466,7 +466,13 @@ def edit_info(id):
                 else:
                     return render_template('error.html', error='Athlete not found')
         
+@app.route('/exclude/<id>')
+def exclude(id):
+    global Athletes, categories, flag, calib_times
 
+    Athletes = [athlete for athlete in Athletes if athlete.number != id]
+    save()
+    return render_template('index.html', Athletes=Athletes, categories=categories, flag=flag, calib = calib_times[2])
 
 
 

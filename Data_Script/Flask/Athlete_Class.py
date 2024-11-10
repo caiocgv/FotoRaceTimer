@@ -101,3 +101,4 @@ class racer:
                 self.finish[i] = Time(data[j])
                 print(data[j])
                 j+=1
+        self.calculate_time()
