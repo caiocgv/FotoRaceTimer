@@ -17,35 +17,109 @@ String text;                   // Variable to store the text to be displayed on 
 
 void handle_root() {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
-                                  "<!DOCTYPE html>"
-                                  "<html>"
-                                  "<head>"
-                                    "<meta name='viewport' content='width=device-width, initial-scale=1'>"
-                                    "<style>"
-                                      "body {font-family: Arial; margin-left: 20px;}"
-                                      "form {display: inline-block;}"
-                                      "button {background-color: #4CAF50; color: white; padding: 14px 20px; margin: 8px 0; border: none; cursor: pointer; font-size: xx-large;}"
-                                      "button:hover {opacity: 0.8;}"
-                                    "</style>"
-                                  "<title> FotoCelula1 </title>"  
-                                  "</head>"
-                                  "<body>"
-                                  "<form action='/post' method='post'>"
-                                    "<label for='numberInput' style='font-size: xx-large'>Enter a number:</label>"
-                                    "<input type='number' id='message' name='message' onchange='submitForm()'>"
-                                    ""
-                                  "</form>"
-                                  "<h2 style='font-size: xx-large'>"
-                                      + text +        // Display the text on the webpage
-                                  "</h2>"
-                                  "<form action='/delete'>"
-                                    "<button type='submit'>Limpar Resultados</button>"
-                                  "</form>"
-                                  "<form action='/download'>"
-                                    "<button type='submit'>Salvar Dados</button>"
-                                  "</form>"
-                                  "</body>"
-                                  );
+                                   "<!DOCTYPE html> \
+                                   <html> \
+                                   <head> \
+                                     <meta name='viewport' content='width=device-width, initial-scale=1'> \
+                                     <style> \
+                                    body { \
+                                        font-family: Arial; \
+                                        margin-left: 20px; \
+                                        background-color: rgb(48, 46, 46); \
+                                        color: aliceblue; \
+                                    } \
+ \
+                                    div { \
+                                        display: flex; \
+                                        justify-content: space-evenly; \
+                                    } \
+ \
+                                    form { \
+                                        display: inline-block; \
+                                    } \
+ \
+                                    input { \
+                                        width: 100px; \
+                                        height: 30px; \
+                                        font-size: xx-large; \
+                                        border-radius: 5px; \
+                                    } \
+ \
+                                    button { \
+                                        background-color: gray; \
+                                        color: aliceblue; \
+                                        padding: 4px 8px; \
+                                        margin: 8px 0; \
+                                        border: none; \
+                                        cursor: pointer; \
+                                        font-size: large; \
+                                        border-radius: 5px; \
+                                    } \
+ \
+                                    button:hover { \
+                                        opacity: 0.8; \
+                                    } \
+                                    table { \
+                                        width: 50%; \
+                                        text-align: center; \
+                                        font-size: x-large; \
+                                        border-radius: 5px;  \
+                                    } \
+ \
+                                    table tr:nth-child(even) { \
+                                        background-color: lightgray; \
+                                        color: black; \
+                                    } \
+ \
+                                    table tr:nth-child(odd) { \
+                                        background-color: rgb(76, 76, 76); \
+                                    } \
+                                    h1 { \
+                                        text-align: center; \
+                                    } \
+                                     </style> \
+                                    <title> FotoCelula1 </title>   \
+                                    </head> \
+                                    <body> \
+                                    <h1>Modo de Uso</h1> \
+                                    <div> \
+                                    <div style='width: 500px;'> \
+                                        <form action='/start_finish'> \
+                                            <button type='submit'>Inicio/Fim</button> \
+                                        </form> \
+                                        <form action='/round_course'> \
+                                            <button type='submit'>Circuito Fechado</button> \
+                                        </form> \
+                                    </div> \
+                                    </div> \
+                                    <br><hr><br> \
+                                    <div> \
+                                        <form action='/post' method='post'> \
+                                            <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
+                                            <input type='number' id='message' height= 20px name='message' onchange='submitForm()'>                                        \
+                                        </form> \
+                                    </div> \
+                                    <br><hr><br> \
+                                    <div> \
+                                        <table> \
+                                            <tr> \
+                                                <th>ID</th> \
+                                                <th>Time</th> \
+                                            </tr>"
+                                                + text +
+                                        "</table> \
+                                    </div> \
+                                    <br><hr><br> \
+                                    <div> \
+                                        <form action='/delete'> \
+                                            <button type='submit'>Limpar Resultados</button> \
+                                        </form> \
+                                        <form action='/download'> \
+                                            <button type='submit'>Salvar Dados</button> \
+                                        </form> \
+                                    </div> \
+                                   </body> \
+                                  ");
 }
 
 
@@ -105,7 +179,7 @@ void FileDownload() {
 void handle_post() {
   String message = "POST request with no parameters";
   if (server.hasArg("message")) {
-    text = text + "<br>" + server.arg("message");
+    text = "<tr><td>" + server.arg("message") + "</td></tr>" + text; // Add the new text to the existing text
   }
   FileWrite(); // Write the text to permanent memory
   handle_root(); // Display the updated text on the webpage
