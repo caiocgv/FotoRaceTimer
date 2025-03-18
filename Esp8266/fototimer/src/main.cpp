@@ -3,6 +3,10 @@
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <LittleFS.h>
+#include <Wire.h>
+
+#define DS1307_ADDRESS 0x68
+byte zero = 0x00;
 
 const char* ssid = "FotoCelula1";  // SSID of your access point
 const byte DNS_PORT = 53;           // Port for DNS server
@@ -123,10 +127,33 @@ void handle_root() {
 }
 
 
+byte decToBcd(byte val){
+// Conversão de decimal para binário
+  return ( (val/10*16) + (val%10) );
+}
+
+byte bcdToDec(byte val)  {
+// Conversão de binário para decimal
+  return ( (val/16*10) + (val%16) );
+}
+
+void get_time(){
+  Wire.beginTransmission(DS1307_ADDRESS);
+  Wire.write(zero);
+  Wire.endTransmission();
+
+  Wire.requestFrom(DS1307_ADDRESS, 3);
+
+  int segundo = bcdToDec(Wire.read());
+  int minuto = bcdToDec(Wire.read());
+  int hora = bcdToDec(Wire.read() & 0b111111);    //Formato 24 horas
+  text = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + "</td></tr>" + text;
+}
+
 void FileWrite() {
   File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
   if (file) {
-    file.println(text);
+    file.println(text); // Write the text to the file
     file.close();
   } else {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
@@ -179,7 +206,9 @@ void FileDownload() {
 void handle_post() {
   String message = "POST request with no parameters";
   if (server.hasArg("message")) {
-    text = "<tr><td>" + server.arg("message") + "</td></tr>" + text; // Add the new text to the existing text
+    get_time();
+    text = "<tr><td>" + server.arg("message") + "</td>" + text; // Add the new text to the existing text
+    
   }
   FileWrite(); // Write the text to permanent memory
   handle_root(); // Display the updated text on the webpage
@@ -187,6 +216,9 @@ void handle_post() {
 
 void setup(){
   pinMode(LED_BUILTIN, OUTPUT);
+
+  Wire.begin();
+  // setTime();
 
   Serial.begin(9600);
   Wifi.softAP(ssid);               // Set the ESP8266 to Access Point mode
@@ -212,7 +244,6 @@ void loop(){
   server.handleClient();      // Handle client requests
   
   if (WiFi.softAPgetStationNum() == 0) {
-    delay(500);
     digitalWrite(LED_BUILTIN, HIGH);
   }
   else{
