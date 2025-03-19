@@ -3,10 +3,9 @@
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <LittleFS.h>
-#include <Wire.h>
+#include <RTClib.h>
 
-#define DS1307_ADDRESS 0x68
-byte zero = 0x00;
+RTC_DS1307 rtc;
 
 const char* ssid = "FotoCelula1";  // SSID of your access point
 const byte DNS_PORT = 53;           // Port for DNS server
@@ -17,7 +16,8 @@ ESP8266WiFiClass Wifi;              // Create a Wifi object
 
 String text;                   // Variable to store the text to be displayed on the webpage
 
-
+int seconds; 
+int long sec_mill;
 
 void handle_root() {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
@@ -126,28 +126,13 @@ void handle_root() {
                                   ");
 }
 
-
-byte decToBcd(byte val){
-// Conversão de decimal para binário
-  return ( (val/10*16) + (val%10) );
-}
-
-byte bcdToDec(byte val)  {
-// Conversão de binário para decimal
-  return ( (val/16*10) + (val%16) );
-}
-
-void get_time(){
-  Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(zero);
-  Wire.endTransmission();
-
-  Wire.requestFrom(DS1307_ADDRESS, 3);
-
-  int segundo = bcdToDec(Wire.read());
-  int minuto = bcdToDec(Wire.read());
-  int hora = bcdToDec(Wire.read() & 0b111111);    //Formato 24 horas
-  text = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + "</td></tr>" + text;
+void get_time(long sec_mill){
+  DateTime now = rtc.now();
+  int hora = now.hour();
+  int minuto = now.minute();
+  int segundo = now.second();
+  int milisegundo = (millis() - sec_mill) % 1000;
+  text = "<td>" + String(hora, DEC) + ":" + String(minuto, DEC) + ":" + String(segundo, DEC) + ":" + String(milisegundo) + "</td></tr>" + text;
 }
 
 void FileWrite() {
@@ -206,7 +191,7 @@ void FileDownload() {
 void handle_post() {
   String message = "POST request with no parameters";
   if (server.hasArg("message")) {
-    get_time();
+    get_time(sec_mill);
     text = "<tr><td>" + server.arg("message") + "</td>" + text; // Add the new text to the existing text
     
   }
@@ -217,8 +202,12 @@ void handle_post() {
 void setup(){
   pinMode(LED_BUILTIN, OUTPUT);
 
-  Wire.begin();
+  if (!rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    while (1);
+  }
   // setTime();
+  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
   Serial.begin(9600);
   Wifi.softAP(ssid);               // Set the ESP8266 to Access Point mode
@@ -249,5 +238,10 @@ void loop(){
   else{
     digitalWrite(LED_BUILTIN, LOW);
   }
-  
+
+  // emulate milliseconds on RTC module
+  if (seconds != rtc.now().second()){
+    seconds = rtc.now().second();
+    sec_mill = millis();
+  }
 }
