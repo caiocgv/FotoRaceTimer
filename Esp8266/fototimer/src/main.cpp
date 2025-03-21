@@ -16,7 +16,7 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, tempo;                   // Variable to store the text to be displayed on the webpage
+String text, tempo, id;                   // Variable to store the text to be displayed on the webpage
 
 int seconds, sensorValue; 
 unsigned long sec_mill, previousMillis;
@@ -138,16 +138,6 @@ void recalibrar() {
   sensorValue = sensorValue / 10 - 50;
 }
 
-void get_time(){
-  DateTime now = rtc.now();
-  int hora = now.hour();
-  int minuto = now.minute();
-  int segundo = now.second();
-  int milisegundo = (millis() - sec_mill) % 1000;
-  tempo = "<td>" + String(hora, DEC) + ":" + String(minuto, DEC) + ":" + String(segundo, DEC) + ":" + String(milisegundo) + "</td></tr>" + text;
-  recalibrar();
-}
-
 void FileWrite() {
   File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
   if (file) {
@@ -156,6 +146,33 @@ void FileWrite() {
   } else {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
   }
+}
+
+void handle_post() {
+  if (server.hasArg("message")) { // Check if the POST request has the message parameter
+    id = server.arg("message");
+  }
+  if (tempo != "" && id != "") { // Check if the text is not empty
+    text = "<tr><td>" + server.arg("message") + "</td>" + tempo + text; // Add the new text to the existing text    
+    tempo = "";
+    id = "";
+
+    FileWrite(); // Write the text to permanent memory
+  } 
+
+  
+  handle_root(); // Display the updated text on the webpage
+}
+
+void get_time(){
+  DateTime now = rtc.now();
+  int hora = now.hour();
+  int minuto = now.minute();
+  int segundo = now.second();
+  int milisegundo = (millis() - sec_mill) % 1000;
+  tempo = "<td>" + String(hora, DEC) + ":" + String(minuto, DEC) + ":" + String(segundo, DEC) + ":" + String(milisegundo) + "</td></tr>" + text;
+  recalibrar();
+  handle_post();
 }
 
 void FileRead() {
@@ -199,18 +216,6 @@ void FileDownload() {
     server.send(404, "text/plain", "File not found");
   }
   handle_root(); // Display the updated text on the webpage
-}
-
-void handle_post() {
-  if (server.hasArg("message")) {
-    if (tempo != "") {
-      text = "<tr><td>" + server.arg("message") + "</td>" + tempo + text; // Add the new text to the existing text    
-      tempo = "";
-    }
-
-  FileWrite(); // Write the text to permanent memory
-  handle_root(); // Display the updated text on the webpage
-  }
 }
 
 void setup() {
