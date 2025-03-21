@@ -5,6 +5,8 @@
 #include <LittleFS.h>
 #include <RTClib.h>
 
+#define sensorPin A0
+
 RTC_DS1307 rtc;
 
 const char* ssid = "FotoCelula1";  // SSID of your access point
@@ -14,10 +16,11 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text;                   // Variable to store the text to be displayed on the webpage
+String text, tempo;                   // Variable to store the text to be displayed on the webpage
 
-int seconds; 
-int long sec_mill;
+int seconds, sensorValue; 
+unsigned long sec_mill, previousMillis;
+const int interval = 100; // intervalo de leitura do sensor
 
 void handle_root() {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
@@ -126,13 +129,23 @@ void handle_root() {
                                   ");
 }
 
-void get_time(long sec_mill){
+void recalibrar() {
+  sensorValue = 0;
+  for (int i = 0; i < 10; i++) {
+    sensorValue = sensorValue + analogRead(sensorPin);
+    delay(100);
+  }
+  sensorValue = sensorValue / 10 - 50;
+}
+
+void get_time(){
   DateTime now = rtc.now();
   int hora = now.hour();
   int minuto = now.minute();
   int segundo = now.second();
   int milisegundo = (millis() - sec_mill) % 1000;
-  text = "<td>" + String(hora, DEC) + ":" + String(minuto, DEC) + ":" + String(segundo, DEC) + ":" + String(milisegundo) + "</td></tr>" + text;
+  tempo = "<td>" + String(hora, DEC) + ":" + String(minuto, DEC) + ":" + String(segundo, DEC) + ":" + String(milisegundo) + "</td></tr>" + text;
+  recalibrar();
 }
 
 void FileWrite() {
@@ -189,17 +202,18 @@ void FileDownload() {
 }
 
 void handle_post() {
-  String message = "POST request with no parameters";
   if (server.hasArg("message")) {
-    get_time(sec_mill);
-    text = "<tr><td>" + server.arg("message") + "</td>" + text; // Add the new text to the existing text
-    
-  }
+    if (tempo != "") {
+      text = "<tr><td>" + server.arg("message") + "</td>" + tempo + text; // Add the new text to the existing text    
+      tempo = "";
+    }
+
   FileWrite(); // Write the text to permanent memory
   handle_root(); // Display the updated text on the webpage
+  }
 }
 
-void setup(){
+void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   if (!rtc.begin()) {
@@ -215,10 +229,17 @@ void setup(){
 
   dnsS.start(DNS_PORT, "*", WiFi.softAPIP()); // Start the DNS server
 
+  while (WiFi.softAPgetStationNum() == 0) { // Wait for a client to connect to the access point
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
+  }
+
   if (!LittleFS.begin()) { // Initialize LittleFS
     Serial.println("Failed to initialize LittleFS");
     while (1) {} // Stop the program if LittleFS initialization fails
   }
+
+  recalibrar();
 
   server.on("/", HTTP_GET, handle_root);
   server.on("/post", HTTP_POST, handle_post);
@@ -231,17 +252,23 @@ void setup(){
 void loop(){
   dnsS.processNextRequest();  // Handle DNS requests
   server.handleClient();      // Handle client requests
-  
-  if (WiFi.softAPgetStationNum() == 0) {
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else{
-    digitalWrite(LED_BUILTIN, LOW);
-  }
 
   // emulate milliseconds on RTC module
   if (seconds != rtc.now().second()){
     seconds = rtc.now().second();
     sec_mill = millis();
+  }
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    // do something
+  
+    if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
+      get_time();
+
+    } else if (analogRead(sensorPin) > sensorValue + 100){ // Se a leitura do sensor for maior que o valor de referencia recalibra
+      recalibrar();
+    }
   }
 }
