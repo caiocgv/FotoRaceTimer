@@ -113,7 +113,7 @@ void handle_root(String texts) {
                                                 <th>ID</th> \
                                                 <th>Time</th> \
                                             </tr>"
-                                                + text +
+                                                + texts +
                                         "</table> \
                                     </div> \
                                     <br><hr><br> \
