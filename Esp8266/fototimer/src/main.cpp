@@ -162,7 +162,13 @@ void handle_post() {
   } 
 
   
-  handle_root(); // Display the updated text on the webpage
+If (tempo != ""){
+  handle_root(tempo + text);
+} elseif (id != ""){
+  handle_root(id + text);
+} else {
+  handle_root(text);
+}
 }
 
 void get_time(){
