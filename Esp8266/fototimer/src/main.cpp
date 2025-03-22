@@ -16,13 +16,13 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, newText, tempo, id;                   // Variable to store the text to be displayed on the webpage
+String text, newText, temp_text, tempo, id;                   // Variable to store the text to be displayed on the webpage
 
 int seconds, sensorValue; 
 unsigned long sec_mill, previousMillis;
 const int interval = 100; // intervalo de leitura do sensor
 
-void handle_root(String texts) {
+void handle_root() {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
                                    "<!DOCTYPE html> \
                                    <html> \
@@ -113,7 +113,7 @@ void handle_root(String texts) {
                                                 <th>ID</th> \
                                                 <th>Time</th> \
                                             </tr>"
-                                                + texts +
+                                                + text +
                                         "</table> \
                                     </div> \
                                     <br><hr><br> \
@@ -133,7 +133,7 @@ void recalibrar() {
   sensorValue = 0;
   for (int i = 0; i < 10; i++) {
     sensorValue = sensorValue + analogRead(sensorPin);
-    delay(100);
+    delay(200);
   }
   sensorValue = sensorValue / 10 - 50;
 }
@@ -143,6 +143,7 @@ void FileWrite() {
   if (file) {
     file.println(newText); // Write the text to the file
     file.close();
+    newText = "";
   } else {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
   }
@@ -152,23 +153,18 @@ void handle_post() {
   if (server.hasArg("message")) { // Check if the POST request has the message parameter
     id = server.arg("message");
   }
+
   if (tempo != "" && id != "") { // Check if the text is not empty
-    newText = "<tr><td>" + server.arg("message") + "</td>" + tempo;
-    text = newText + text // Add the new text to the existing text    
+
+    newText = "<tr><td>" + id + "</td>" + tempo;
+    text = newText + text; // Add the new text to the existing text    
     tempo = "";
     id = "";
 
     FileWrite(); // Write the text to permanent memory
-  } 
-
+  }
   
-If (tempo != ""){
-  handle_root(tempo + text);
-} elseif (id != ""){
-  handle_root(id + text);
-} else {
-  handle_root(text);
-}
+  handle_root();
 }
 
 void get_time(){
@@ -177,7 +173,7 @@ void get_time(){
   int minuto = now.minute();
   int segundo = now.second();
   int milisegundo = (millis() - sec_mill) % 1000;
-  tempo = "<td>" + String(hora, DEC) + ":" + String(minuto, DEC) + ":" + String(segundo, DEC) + ":" + String(milisegundo) + "</td></tr>" + text;
+  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
   recalibrar();
   handle_post();
 }
@@ -271,10 +267,10 @@ void loop(){
     sec_mill = millis();
   }
 
+  // Leitura do sensor com intervalo de tempo sem bloqueio do código
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis - previousMillis >= interval) { // Verifica se o intervalo de leitura foi atingido
     previousMillis = currentMillis;
-    // do something
   
     if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
       get_time();
