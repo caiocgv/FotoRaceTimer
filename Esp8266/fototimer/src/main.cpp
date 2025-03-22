@@ -16,7 +16,7 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, tempo, id;                   // Variable to store the text to be displayed on the webpage
+String text, newText, tempo, id;                   // Variable to store the text to be displayed on the webpage
 
 int seconds, sensorValue; 
 unsigned long sec_mill, previousMillis;
