@@ -22,7 +22,7 @@ int seconds, sensorValue;
 unsigned long sec_mill, previousMillis;
 const int interval = 100; // intervalo de leitura do sensor
 
-void handle_root() {
+void handle_root(String texts) {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
                                    "<!DOCTYPE html> \
                                    <html> \
