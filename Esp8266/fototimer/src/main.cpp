@@ -131,11 +131,8 @@ void handle_root() {
 
 void recalibrar() {
   sensorValue = 0;
-  for (int i = 0; i < 10; i++) {
-    sensorValue = sensorValue + analogRead(sensorPin);
-    delay(200);
-  }
-  sensorValue = sensorValue / 10 - 50;
+  sensorValue = analogRead(sensorPin);
+  sensorValue = sensorValue - 50;
 }
 
 void FileWrite() {
