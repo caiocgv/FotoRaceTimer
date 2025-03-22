@@ -141,7 +141,7 @@ void recalibrar() {
 void FileWrite() {
   File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
   if (file) {
-    file.println(text); // Write the text to the file
+    file.println(newText); // Write the text to the file
     file.close();
   } else {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
