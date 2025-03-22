@@ -153,7 +153,8 @@ void handle_post() {
     id = server.arg("message");
   }
   if (tempo != "" && id != "") { // Check if the text is not empty
-    text = "<tr><td>" + server.arg("message") + "</td>" + tempo + text; // Add the new text to the existing text    
+    newText = "<tr><td>" + server.arg("message") + "</td>" + tempo;
+    text = newText + text // Add the new text to the existing text    
     tempo = "";
     id = "";
 
