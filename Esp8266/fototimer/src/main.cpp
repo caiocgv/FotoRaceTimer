@@ -245,8 +245,7 @@ void setup() {
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
   }
-  digitalWrite(LED_BUILTIN, LOW);
-  
+
   if (!LittleFS.begin()) { // Initialize LittleFS
     Serial.println("Failed to initialize LittleFS");
     while (1) {} // Stop the program if LittleFS initialization fails
