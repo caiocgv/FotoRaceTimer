@@ -16,13 +16,13 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, tempo, id;                   // Variable to store the text to be displayed on the webpage
+String text, newText, tempo, id;                   // Variable to store the text to be displayed on the webpage
 
 int seconds, sensorValue; 
 unsigned long sec_mill, previousMillis;
 const int interval = 100; // intervalo de leitura do sensor
 
-void handle_root() {
+void handle_root(String texts) {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
                                    "<!DOCTYPE html> \
                                    <html> \
@@ -113,7 +113,7 @@ void handle_root() {
                                                 <th>ID</th> \
                                                 <th>Time</th> \
                                             </tr>"
-                                                + text +
+                                                + texts +
                                         "</table> \
                                     </div> \
                                     <br><hr><br> \
@@ -141,7 +141,7 @@ void recalibrar() {
 void FileWrite() {
   File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
   if (file) {
-    file.println(text); // Write the text to the file
+    file.println(newText); // Write the text to the file
     file.close();
   } else {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
@@ -153,7 +153,8 @@ void handle_post() {
     id = server.arg("message");
   }
   if (tempo != "" && id != "") { // Check if the text is not empty
-    text = "<tr><td>" + server.arg("message") + "</td>" + tempo + text; // Add the new text to the existing text    
+    newText = "<tr><td>" + server.arg("message") + "</td>" + tempo;
+    text = newText + text // Add the new text to the existing text    
     tempo = "";
     id = "";
 
@@ -161,7 +162,13 @@ void handle_post() {
   } 
 
   
-  handle_root(); // Display the updated text on the webpage
+If (tempo != ""){
+  handle_root(tempo + text);
+} elseif (id != ""){
+  handle_root(id + text);
+} else {
+  handle_root(text);
+}
 }
 
 void get_time(){
