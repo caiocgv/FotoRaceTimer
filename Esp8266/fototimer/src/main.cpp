@@ -16,11 +16,11 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, newText, temp_text, tempo, id;                   // Variable to store the text to be displayed on the webpage
+String text, newText, tempo, id;                   // Variable to store the text to be displayed on the webpage
 
 int seconds, sensorValue; 
-unsigned long sec_mill, previousMillis;
-const int interval = 100; // intervalo de leitura do sensor
+unsigned long sec_mill, previousMillis, interval = 100;
+
 
 void handle_root() {
     server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
@@ -154,7 +154,7 @@ void handle_post() {
   if (tempo != "" && id != "") { // Check if the text is not empty
 
     newText = "<tr><td>" + id + "</td>" + tempo;
-    text = newText + text; // Add the new text to the existing text    
+    text = newText;
     tempo = "";
     id = "";
 
@@ -264,15 +264,18 @@ void loop(){
     seconds = rtc.now().second();
     sec_mill = millis();
   }
-  digitalWrite(LED_BUILTIN,LOW);
+
   // Leitura do sensor com intervalo de tempo sem bloqueio do código
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) { // Verifica se o intervalo de leitura foi atingido
     previousMillis = currentMillis;
+    interval = 100;    
+    digitalWrite(LED_BUILTIN,LOW);
   
     if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
       digitalWrite(LED_BUILTIN,HIGH);
       get_time();
+      interval = 2000;
 
     } else if (analogRead(sensorPin) > sensorValue + 100){ // Se a leitura do sensor for maior que o valor de referencia recalibra
       recalibrar();
