@@ -175,7 +175,6 @@ void get_time(){
   int milisegundo = (millis() - sec_mill) % 1000;
   tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
   recalibrar();
-  handle_post();
 }
 
 void FileRead() {
@@ -240,6 +239,8 @@ void setup() {
   while (WiFi.softAPgetStationNum() == 0) { // Wait for a client to connect to the access point
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
   }
 
   if (!LittleFS.begin()) { // Initialize LittleFS
@@ -266,13 +267,14 @@ void loop(){
     seconds = rtc.now().second();
     sec_mill = millis();
   }
-
+  digitalWrite(LED_BUILTIN,LOW);
   // Leitura do sensor com intervalo de tempo sem bloqueio do código
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) { // Verifica se o intervalo de leitura foi atingido
     previousMillis = currentMillis;
   
     if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
+      digitalWrite(LED_BUILTIN,HIGH);
       get_time();
 
     } else if (analogRead(sensorPin) > sensorValue + 100){ // Se a leitura do sensor for maior que o valor de referencia recalibra
