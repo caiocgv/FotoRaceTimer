@@ -130,6 +130,26 @@ void handle_root() {
                     ");
                 }
 
+
+void recalibrar() {
+  sensorValue = 0;
+  sensorValue = analogRead(sensorPin);
+  sensorValue = sensorValue - 50;
+}
+
+
+void get_time(){
+  DateTime now = rtc.now();
+  int hora = now.hour();
+  int minuto = now.minute();
+  int segundo = now.second();
+  int milisegundo = (millis() - sec_mill) % 1000;
+  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
+  strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
+  recalibrar();
+}
+
+
 void settings() {
   get_time(); // Get the current time from the RTC module
   server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
@@ -193,11 +213,6 @@ void settings() {
               );
             }
 
-void recalibrar() {
-  sensorValue = 0;
-  sensorValue = analogRead(sensorPin);
-  sensorValue = sensorValue - 50;
-}
 
 void FileWrite() {
   File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
@@ -209,6 +224,7 @@ void FileWrite() {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
   }
 }
+
 
 void handle_post() {
   if (server.hasArg("message")) { // Check if the POST request has the message parameter
@@ -228,16 +244,6 @@ void handle_post() {
   handle_root();
 }
 
-void get_time(){
-  DateTime now = rtc.now();
-  int hora = now.hour();
-  int minuto = now.minute();
-  int segundo = now.second();
-  int milisegundo = (millis() - sec_mill) % 1000;
-  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
-  strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
-  recalibrar();
-}
 
 void FileRead() {
   if (LittleFS.exists("/text.txt")) {
@@ -252,6 +258,7 @@ void FileRead() {
   }
 }
 
+
 void FileDelete() {
   if (LittleFS.exists("/text.txt")) {
     if (LittleFS.remove("/text.txt")) {
@@ -265,6 +272,7 @@ void FileDelete() {
   text = ""; // Clear the text
   handle_root(); // Display the updated text on the webpage
 }
+
 
 void FileDownload() {
   if (LittleFS.exists("/text.txt")) {
@@ -281,6 +289,7 @@ void FileDownload() {
   }
   handle_root(); // Display the updated text on the webpage
 }
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -320,6 +329,7 @@ void setup() {
   server.begin(); // Start the server
   FileRead();
 }
+
 
 void loop(){
   dnsS.processNextRequest();  // Handle DNS requests
