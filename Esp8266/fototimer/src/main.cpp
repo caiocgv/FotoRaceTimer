@@ -61,13 +61,14 @@ void handle_root() {
                     cursor: pointer; \
                     font-size: large; \
                     border-radius: 5px; \
+                    width: 95%; \
                   } \
  \
                   button:hover { \
                     opacity: 0.8; \
                   } \
                   table { \
-                    width: 50%; \
+                    width: 80%; \
                     text-align: center; \
                     font-size: x-large; \
                     border-radius: 5px;  \
@@ -88,16 +89,6 @@ void handle_root() {
                     <title> Home </title>   \
                     </head> \
                     <body> \
-                    <h1>Modo de Operação</h1> \
-                    <div> \
-                      <form action=\"/start_finish\"> \
-                      <button type=\"submit\">Início/Fim</button> \
-                      </form> \
-                      <form action=\"/round_course\"> \
-                      <button type=\"submit\">Circuito Fechado</button> \
-                      </form> \
-                    </div> \
-                    <br><hr><br> \
                     <div> \
                     <form action='/post' method='post'> \
                       <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
@@ -123,7 +114,7 @@ void handle_root() {
                       <button type='submit'>Salvar Dados</button> \
                     </form> \
                     <form action='/settings'> \
-                      <button type='submit'>Configurações</button> \
+                      <button type='submit'>Ajustes</button> \
                     </form> \
                     </div> \
                      </body> \
@@ -159,31 +150,61 @@ void settings() {
                           <title>Settings</title> \
                           <style> \
                             body { \
-                              font-family: Arial; \
-                              margin-left: 20px; \
-                              margin-right: 20px; \
-                              background-color: rgb(48, 46, 46); \
-                              color: aliceblue; \
-                              text-align: center; \
+                                font-family: Arial; \
+                                margin-left: 20px; \
+                                background-color: rgb(48, 46, 46); \
+                                color: aliceblue; \
+                                text-align: center; \
                             } \
-                            button { \
-                              background-color: gray; \
-                              color: aliceblue; \
-                              padding: 4px 8px; \
-                              margin: 8px 0; \
-                              border: none; \
-                              cursor: pointer; \
-                              font-size: large; \
-                              border-radius: 5px; \
-                            } \
-                        \
-                            button:hover { \
-                              opacity: 0.8; \
-                            } \
-                            \
+                    \
                             div { \
-                              display: flex; \
-                              justify-content: space-evenly; \
+                                display: flex; \
+                                justify-content: space-evenly; \
+                            } \
+                    \
+                            form { \
+                                display: inline-block; \
+                            } \
+                    \
+                            input { \
+                                width: 100px; \
+                                height: 30px; \
+                                font-size: xx-large; \
+                                border-radius: 5px; \
+                            } \
+                    \
+                            button { \
+                                background-color: gray; \
+                                color: aliceblue; \
+                                padding: 4px 8px; \
+                                margin: 8px 0; \
+                                border: none; \
+                                cursor: pointer; \
+                                font-size: large; \
+                                border-radius: 5px; \
+                                width: 95%; \
+                            } \
+                    \
+                            button:hover { \
+                                opacity: 0.8; \
+                            } \
+                            table { \
+                                width: 80%; \
+                                text-align: center; \
+                                font-size: x-large; \
+                                border-radius: 5px;  \
+                            } \
+                    \
+                            table tr:nth-child(even) { \
+                                background-color: lightgray; \
+                                color: black; \
+                            } \
+                    \
+                            table tr:nth-child(odd) { \
+                                background-color: rgb(76, 76, 76); \
+                            } \
+                            h1 { \
+                                text-align: center; \
                             } \
                           </style> \
                         </head> \
@@ -209,13 +230,13 @@ void settings() {
                             <button type='submit'>Voltar</button> \
                           </form> \
                         </body> \
-                        </html>"
-              );
-            }
+                        </html>" 
+              ); 
+            } 
 
 
 void FileWrite() {
-  File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
+  File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode 
   if (file) {
     file.println(newText); // Write the text to the file
     file.close();
