@@ -213,10 +213,6 @@ void settings() {
                         <body> \
                           <h1>Relogio da Fotocelula</h1> \
                           <h2>"+ strTime + "</h2> \
-                          <form action='/update_time' method='post'> \
-                              <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'> \
-                              <button type='button' onclick='updateTime()'>Atualizar</button> \
-                          </form> \
                           <hr> \
                           <h1>Modo de Uso</h1> \
                           <div> \
@@ -245,14 +241,15 @@ void settings() {
                                 \
                                 var timeString = hours + ':' + minutes + ':' + seconds; \
                                 document.getElementById('current-time').textContent = timeString; \
+                                document.getElementById('update_time').submit(); \
                             } \
                             setInterval(function() { \
-                                                  location.reload();\
-                                              }\
-                                              , 1000);\
-                        </script> \
-                        </body> \
-                        </html>" 
+                                  location.reload();\
+                              }\
+                              , 1000);\
+                            </script> \
+                            </body> \
+                            </html>" 
               ); 
             } 
 

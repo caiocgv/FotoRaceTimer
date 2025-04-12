@@ -65,8 +65,8 @@
 </head>
 <body>
     <h1>Relogio da Fotocelula</h1>
-    <h2>tempo</h2>
-    <form action='/update_time' method='post'>
+    <h2>tempo</h2>        
+    <form action='/update_time' method='post' id='update_time'>
         <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'>
         <button type='button' onclick='updateTime()'>Atualizar</button>
     </form>
@@ -101,6 +101,7 @@
 
             var timeString = hours + ':' + minutes + ':' + seconds;
             document.getElementById('current-time').textContent = timeString;
+            document.getElementById('update_time').submit();
         }
 
         // Update the page every second
