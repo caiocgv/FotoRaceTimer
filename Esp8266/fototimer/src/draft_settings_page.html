@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin-left: 20px;
+            margin-right: 20px;
+            background-color: rgb(48, 46, 46);
+            color: aliceblue;
+            text-align: center;
+        }
+        button {
+            background-color: gray;
+            color: aliceblue;
+            padding: 4px 8px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            font-size: large;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        div {
+            display: flex;
+            justify-content: space-evenly;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relógio da Fotocelula</h1>
+    <h2 id="current-time">tempo</h2>
+    <form action="/update_time">
+        <button type="submit">Atualizar relógio</button>
+    </form>
+    <hr>
+    <h1>Modo de Operação</h1>
+    <div>
+    <div style="width: 500px;">
+        <form action="/start_finish">
+            <button type="submit">Início/Fim</button>
+        </form>
+        <form action="/round_course">
+            <button type="submit">Circuito Fechado</button>
+        </form>
+    </div>
+    </div>
+
+    <br><hr><br>
+    <form action="/">
+        <button type="submit">Voltar</button>
+    </form>
+    <script>
+        function updateTime() {
+            var currentTime = new Date();
+            var hours = currentTime.getHours();
+            var minutes = currentTime.getMinutes();
+            var seconds = currentTime.getSeconds();
+
+            // Add leading zeros if necessary
+            hours = (hours < 10 ? "0" : "") + hours;
+            minutes = (minutes < 10 ? "0" : "") + minutes;
+            seconds = (seconds < 10 ? "0" : "") + seconds;
+
+            var timeString = hours + ":" + minutes + ":" + seconds;
+            document.getElementById("current-time").textContent = timeString;
+        }
+
+        // Update the time every second
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
