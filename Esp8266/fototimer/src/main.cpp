@@ -61,7 +61,8 @@ void handle_root() {
                     cursor: pointer; \
                     font-size: large; \
                     border-radius: 5px; \
-                    width: 95%; \
+                    width: 105px; \
+                    height: 50px; \
                   } \
  \
                   button:hover { \
@@ -182,7 +183,8 @@ void settings() {
                                 cursor: pointer; \
                                 font-size: large; \
                                 border-radius: 5px; \
-                                width: 95%; \
+                                width: 105px; \
+                                height: 50px; \
                             } \
                     \
                             button:hover { \
@@ -209,17 +211,17 @@ void settings() {
                           </style> \
                         </head> \
                         <body> \
-                          <h1>Relógio da Fotocelula</h1> \
+                          <h1>Relogio da Fotocelula</h1> \
                           <h2>"+ strTime + "</h2> \
                           <form action='/update_time' method='post'> \
                               <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'> \
-                              <button type='submit' onclick='updateTime()'>Atualizar</button> \
+                              <button type='button' onclick='updateTime()'>Atualizar</button> \
                           </form> \
                           <hr> \
-                          <h1>Modo de Operação</h1> \
+                          <h1>Modo de Uso</h1> \
                           <div> \
                             <form action='/start_finish'> \
-                              <button type='submit'>Início/Fim</button> \
+                              <button type='submit'>Inicio/Fim</button> \
                             </form> \
                             <form action='/round_course'> \
                               <button type='submit'>Circuito Fechado</button> \
@@ -232,17 +234,22 @@ void settings() {
                           </form> \
                           <script> \
                             function updateTime() { \
-                                var currentTime = new Date(); \
+                                const currentTime = new Date(); \
                                 var hours = currentTime.getHours(); \
                                 var minutes = currentTime.getMinutes(); \
                                 var seconds = currentTime.getSeconds(); \
+                                \
                                 hours = (hours < 10 ? '0' : '') + hours; \
                                 minutes = (minutes < 10 ? '0' : '') + minutes; \
                                 seconds = (seconds < 10 ? '0' : '') + seconds; \
+                                \
                                 var timeString = hours + ':' + minutes + ':' + seconds; \
                                 document.getElementById('current-time').textContent = timeString; \
                             } \
-                            setInterval(updateTime, 1000); \
+                            setInterval(function() { \
+                                                  location.reload();\
+                                              }\
+                                              , 1000);\
                         </script> \
                         </body> \
                         </html>" 

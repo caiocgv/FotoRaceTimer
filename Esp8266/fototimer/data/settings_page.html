@@ -36,7 +36,8 @@
             cursor: pointer;
             font-size: large;
             border-radius: 5px;
-            width: 95%;
+            width: 105px;
+            height: 50px;
         }
 
         button:hover {
@@ -63,11 +64,11 @@
          </style> 
 </head>
 <body>
-    <h1>Relógio da Fotocelula</h1>
+    <h1>Relogio da Fotocelula</h1>
     <h2>tempo</h2>
     <form action='/update_time' method='post'>
         <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'>
-        <button type='submit' onclick='updateTime()'>Atualizar</button>
+        <button type='button' onclick='updateTime()'>Atualizar</button>
     </form>
     <hr>
     <h1>Modo de uso</h1>
@@ -88,7 +89,7 @@
     </div>
     <script>
         function updateTime() {
-            var currentTime = new Date();
+            const currentTime = new Date();
             var hours = currentTime.getHours();
             var minutes = currentTime.getMinutes();
             var seconds = currentTime.getSeconds();
@@ -102,8 +103,11 @@
             document.getElementById('current-time').textContent = timeString;
         }
 
-        // Update the time every second
-        setInterval(updateTime, 1000);
+        // Update the page every second
+        setInterval(function() {
+            location.reload();
+        }
+        , 1000);
     </script>
 </body>
 </html>
