@@ -210,9 +210,10 @@ void settings() {
                         </head> \
                         <body> \
                           <h1>Relógio da Fotocelula</h1> \
-                          <h2 id='current-time'>"+ strTime +"</h2> \
-                          <form action='/update_time'> \
-                            <button type='submit'>Atualizar relógio</button> \
+                          <h2>"+ strTime + "</h2> \
+                          <form action='/update_time' method='post'> \
+                              <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'> \
+                              <button type='submit' onclick='updateTime()'>Atualizar</button> \
                           </form> \
                           <hr> \
                           <h1>Modo de Operação</h1> \
@@ -229,6 +230,20 @@ void settings() {
                           <form action='/'> \
                             <button type='submit'>Voltar</button> \
                           </form> \
+                          <script> \
+                            function updateTime() { \
+                                var currentTime = new Date(); \
+                                var hours = currentTime.getHours(); \
+                                var minutes = currentTime.getMinutes(); \
+                                var seconds = currentTime.getSeconds(); \
+                                hours = (hours < 10 ? '0' : '') + hours; \
+                                minutes = (minutes < 10 ? '0' : '') + minutes; \
+                                seconds = (seconds < 10 ? '0' : '') + seconds; \
+                                var timeString = hours + ':' + minutes + ':' + seconds; \
+                                document.getElementById('current-time').textContent = timeString; \
+                            } \
+                            setInterval(updateTime, 1000); \
+                        </script> \
                         </body> \
                         </html>" 
               ); 
@@ -312,6 +327,18 @@ void FileDownload() {
 }
 
 
+void update_time() {
+  if (server.hasArg("current-time")) { // Check if the POST request has the current-time parameter
+    String time = server.arg("current-time");
+    int hour = time.substring(0, 2).toInt();
+    int minute = time.substring(3, 5).toInt();
+    int second = time.substring(6, 8).toInt();
+    rtc.adjust(DateTime(rtc.now().year(), rtc.now().month(), rtc.now().day(), hour, minute, second));
+  }
+  settings(); // Display the updated settings page
+}
+
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -347,6 +374,7 @@ void setup() {
   server.on("/delete", HTTP_GET, FileDelete);
   server.on("/download", HTTP_GET, FileDownload);
   server.on("/settings", HTTP_GET, settings);
+  server.on("/update_time", HTTP_POST, update_time);
   server.begin(); // Start the server
   FileRead();
 }

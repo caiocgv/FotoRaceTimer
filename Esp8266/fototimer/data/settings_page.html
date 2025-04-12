@@ -64,9 +64,10 @@
 </head>
 <body>
     <h1>Relógio da Fotocelula</h1>
-    <h2 id='current-time'>tempo</h2>
-    <form action='/update_time'>
-        <button type='submit'>Atualizar</button>
+    <h2>tempo</h2>
+    <form action='/update_time' method='post'>
+        <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'>
+        <button type='submit' onclick='updateTime()'>Atualizar</button>
     </form>
     <hr>
     <h1>Modo de uso</h1>
