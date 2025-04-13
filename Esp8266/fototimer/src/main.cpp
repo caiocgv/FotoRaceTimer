@@ -16,7 +16,7 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, newText, tempo, strTime, id;                   // Variable to store the text to be displayed on the webpage
+String text, newText, tempo, strTime, id, mode;                   
 
 int seconds, sensorValue; 
 unsigned long sec_mill, previousMillis, interval = 100;
@@ -83,13 +83,16 @@ void handle_root() {
                   table tr:nth-child(odd) { \
                     background-color: rgb(76, 76, 76); \
                   } \
-                    h1 { \
+                    h1, h2 { \
                     text-align: center; \
                     } \
                      </style> \
                     <title> Home </title>   \
                     </head> \
                     <body> \
+                    <h1> Modo de Uso </h1> \
+                    <h2>" + mode + "</h2> \
+                    <br><hr><br> \
                     <div> \
                     <form action='/post' method='post'> \
                       <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
@@ -379,6 +382,14 @@ void setup() {
   server.on("/download", HTTP_GET, FileDownload);
   server.on("/settings", HTTP_GET, settings);
   server.on("/update_time", HTTP_POST, update_time);
+  server.on("/start_finish", HTTP_GET, []() {
+    mode = "Inicio/Fim";
+    handle_root();
+  });
+  server.on("/round_course", HTTP_GET, []() {
+    mode = "Circuito Fechado";
+    handle_root();
+  });
   server.begin(); // Start the server
   FileRead();
 }
