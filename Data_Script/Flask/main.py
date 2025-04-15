@@ -152,8 +152,6 @@ def upload():
                         for racers in Athletes:
                             if flag != 'true':
                                 # single stage race, look for the matching number, get the time, break the loop
-                                print ('racers.number', racers.number)
-                                print ('data[i]', data[i])
                                 if str(racers.number) == str(data[i]):
                                     if files.filename.rsplit('.',1)[0].lower() == 'largada':
                                         racers.start = Time(data[i+1])
