@@ -19,7 +19,7 @@ ESP8266WiFiClass Wifi;              // Create a Wifi object
 String text, newText, tempo, strTime, id, mode = "Inicio/Fim"; // Initialize variables                
 
 int seconds, sensorValue; 
-unsigned long sec_mill, previousMillis, interval = 100;
+unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
 
 void handle_root() {
@@ -414,9 +414,21 @@ void loop(){
   
     if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
       digitalWrite(LED_BUILTIN,HIGH);
-      get_time();
-      interval = 2000;
+      
+      if (mode = = "Inicio/Fim"){
+        get_time();
 
+      } else if (mode == "Circuito Fechado"){
+        if (start = 0){
+          start = millis();
+
+        } else {
+          finish = millis();
+          tempo = "<td>" + string((finish - start) / 1000) + "</td></tr>" + text;
+          start = 0;
+        }
+      }
+      interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
     } else if (analogRead(sensorPin) > sensorValue + 100){ // Se a leitura do sensor for maior que o valor de referencia recalibra
       recalibrar();
     }
