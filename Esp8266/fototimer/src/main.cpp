@@ -216,6 +216,10 @@ void settings() {
                         <body> \
                           <h1>Relogio da Fotocelula</h1> \
                           <h2>"+ strTime + "</h2> \
+                          <form action='/update_time' method='post' id='update_time'> \
+                              <input type='text' id='current-time' name='current-time' onchange='submitForm()' style='display: none;'> \
+                              <button type='button' onclick='updateTime()'>Atualizar</button> \
+                          </form> \
                           <hr> \
                           <h1>Modo de Uso</h1> \
                           <div> \
