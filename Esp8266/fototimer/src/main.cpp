@@ -16,118 +16,115 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, newText, tempo, id;                   // Variable to store the text to be displayed on the webpage
+String text, newText, tempo, strTime, id, mode = "Inicio/Fim"; // Initialize variables                
 
 int seconds, sensorValue; 
-unsigned long sec_mill, previousMillis, interval = 100;
+unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
 
 void handle_root() {
-    server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
-                                   "<!DOCTYPE html> \
-                                   <html> \
-                                   <head> \
-                                     <meta name='viewport' content='width=device-width, initial-scale=1'> \
-                                     <style> \
-                                    body { \
-                                        font-family: Arial; \
-                                        margin-left: 20px; \
-                                        background-color: rgb(48, 46, 46); \
-                                        color: aliceblue; \
-                                    } \
+  server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
+                   " <!DOCTYPE html> \
+                   <html> \
+                   <head> \
+                   <meta name='viewport' content='width=device-width, initial-scale=1'> \
+                   <style> \
+                  body { \
+                    font-family: Arial; \
+                    margin-left: 20px; \
+                    background-color: rgb(48, 46, 46); \
+                    color: aliceblue; \
+                  } \
  \
-                                    div { \
-                                        display: flex; \
-                                        justify-content: space-evenly; \
-                                    } \
+                  div { \
+                    display: flex; \
+                    justify-content: space-evenly; \
+                  } \
  \
-                                    form { \
-                                        display: inline-block; \
-                                    } \
+                  form { \
+                    display: inline-block; \
+                  } \
  \
-                                    input { \
-                                        width: 100px; \
-                                        height: 30px; \
-                                        font-size: xx-large; \
-                                        border-radius: 5px; \
-                                    } \
+                  input { \
+                    width: 100px; \
+                    height: 30px; \
+                    font-size: xx-large; \
+                    border-radius: 5px; \
+                  } \
  \
-                                    button { \
-                                        background-color: gray; \
-                                        color: aliceblue; \
-                                        padding: 4px 8px; \
-                                        margin: 8px 0; \
-                                        border: none; \
-                                        cursor: pointer; \
-                                        font-size: large; \
-                                        border-radius: 5px; \
-                                    } \
+                  button { \
+                    background-color: gray; \
+                    color: aliceblue; \
+                    padding: 4px 8px; \
+                    margin: 8px 0; \
+                    border: none; \
+                    cursor: pointer; \
+                    font-size: large; \
+                    border-radius: 5px; \
+                    width: 105px; \
+                    height: 50px; \
+                  } \
  \
-                                    button:hover { \
-                                        opacity: 0.8; \
-                                    } \
-                                    table { \
-                                        width: 50%; \
-                                        text-align: center; \
-                                        font-size: x-large; \
-                                        border-radius: 5px;  \
-                                    } \
+                  button:hover { \
+                    opacity: 0.8; \
+                  } \
+                  table { \
+                    width: 80%; \
+                    text-align: center; \
+                    font-size: x-large; \
+                    border-radius: 5px;  \
+                  } \
  \
-                                    table tr:nth-child(even) { \
-                                        background-color: lightgray; \
-                                        color: black; \
-                                    } \
+                  table tr:nth-child(even) { \
+                    background-color: lightgray; \
+                    color: black; \
+                  } \
  \
-                                    table tr:nth-child(odd) { \
-                                        background-color: rgb(76, 76, 76); \
-                                    } \
-                                    h1 { \
-                                        text-align: center; \
-                                    } \
-                                     </style> \
-                                    <title> FotoCelula1 </title>   \
-                                    </head> \
-                                    <body> \
-                                    <h1>Modo de Uso</h1> \
-                                    <div> \
-                                    <div style='width: 500px;'> \
-                                        <form action='/start_finish'> \
-                                            <button type='submit'>Inicio/Fim</button> \
-                                        </form> \
-                                        <form action='/round_course'> \
-                                            <button type='submit'>Circuito Fechado</button> \
-                                        </form> \
-                                    </div> \
-                                    </div> \
-                                    <br><hr><br> \
-                                    <div> \
-                                        <form action='/post' method='post'> \
-                                            <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
-                                            <input type='number' id='message' height= 20px name='message' onchange='submitForm()'>                                        \
-                                        </form> \
-                                    </div> \
-                                    <br><hr><br> \
-                                    <div> \
-                                        <table> \
-                                            <tr> \
-                                                <th>ID</th> \
-                                                <th>Time</th> \
-                                            </tr>"
-                                                + text +
-                                        "</table> \
-                                    </div> \
-                                    <br><hr><br> \
-                                    <div> \
-                                        <form action='/delete'> \
-                                            <button type='submit'>Limpar Resultados</button> \
-                                        </form> \
-                                        <form action='/download'> \
-                                            <button type='submit'>Salvar Dados</button> \
-                                        </form> \
-                                    </div> \
-                                   </body> \
-                                  ");
-}
+                  table tr:nth-child(odd) { \
+                    background-color: rgb(76, 76, 76); \
+                  } \
+                    h1, h2 { \
+                    text-align: center; \
+                    } \
+                     </style> \
+                    <title> Home </title>   \
+                    </head> \
+                    <body> \
+                    <h1> Modo de Uso </h1> \
+                    <h2>" + mode + "</h2> \
+                    <br><hr><br> \
+                    <div> \
+                    <form action='/post' method='post'> \
+                      <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
+                      <input type='number' id='message' height= 20px name='message' onchange='submitForm()'> \
+                    </form> \
+                    </div> \
+                    <br><hr><br> \
+                    <div> \
+                    <table> \
+                      <tr> \
+                      <th>ID</th> \
+                      <th>Time</th> \
+                      </tr> \
+                      " + text + " \
+                    </table> \
+                    </div> \
+                    <br><hr><br> \
+                    <div> \
+                    <form action='/delete'> \
+                      <button type='submit'>Limpar Resultados</button> \
+                    </form> \
+                    <form action='/download'> \
+                      <button type='submit'>Salvar Dados</button> \
+                    </form> \
+                    <form action='/settings'> \
+                      <button type='submit'>Ajustes</button> \
+                    </form> \
+                    </div> \
+                     </body> \
+                    ");
+                }
+
 
 void recalibrar() {
   sensorValue = 0;
@@ -135,8 +132,129 @@ void recalibrar() {
   sensorValue = sensorValue - 50;
 }
 
+
+void get_time(){
+  DateTime now = rtc.now();
+  int hora = now.hour();
+  int minuto = now.minute();
+  int segundo = now.second();
+  int milisegundo = (millis() - sec_mill) % 1000;
+  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
+  strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
+  recalibrar();
+}
+
+
+void settings() {
+  get_time(); // Get the current time from the RTC module
+  server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
+                     "<!DOCTYPE html> \
+                        <html> \
+                        <head> \
+                          <title>Settings</title> \
+                          <style> \
+                            body { \
+                                font-family: Arial; \
+                                margin-left: 20px; \
+                                background-color: rgb(48, 46, 46); \
+                                color: aliceblue; \
+                                text-align: center; \
+                            } \
+                    \
+                            div { \
+                                display: flex; \
+                                justify-content: space-evenly; \
+                            } \
+                    \
+                            form { \
+                                display: inline-block; \
+                            } \
+                    \
+                            input { \
+                                width: 100px; \
+                                height: 30px; \
+                                font-size: xx-large; \
+                                border-radius: 5px; \
+                            } \
+                    \
+                            button { \
+                                background-color: gray; \
+                                color: aliceblue; \
+                                padding: 4px 8px; \
+                                margin: 8px 0; \
+                                border: none; \
+                                cursor: pointer; \
+                                font-size: large; \
+                                border-radius: 5px; \
+                                width: 105px; \
+                                height: 50px; \
+                            } \
+                    \
+                            button:hover { \
+                                opacity: 0.8; \
+                            } \
+                            table { \
+                                width: 80%; \
+                                text-align: center; \
+                                font-size: x-large; \
+                                border-radius: 5px;  \
+                            } \
+                    \
+                            table tr:nth-child(even) { \
+                                background-color: lightgray; \
+                                color: black; \
+                            } \
+                    \
+                            table tr:nth-child(odd) { \
+                                background-color: rgb(76, 76, 76); \
+                            } \
+                            h1 { \
+                                text-align: center; \
+                            } \
+                          </style> \
+                        </head> \
+                        <body> \
+                          <h1>Relogio da Fotocelula</h1> \
+                          <h2>"+ strTime + "</h2> \
+                          <hr> \
+                          <h1>Modo de Uso</h1> \
+                          <div> \
+                            <form action='/start_finish'> \
+                              <button type='submit'>Inicio/Fim</button> \
+                            </form> \
+                            <form action='/round_course'> \
+                              <button type='submit'>Circuito Fechado</button> \
+                            </form> \
+                          </div> \
+                        \
+                          <br><hr><br> \
+                          <form action='/'> \
+                            <button type='submit'>Voltar</button> \
+                          </form> \
+                          <script> \
+                            function updateTime() { \
+                                const currentTime = new Date(); \
+                                var hours = currentTime.getHours(); \
+                                var minutes = currentTime.getMinutes(); \
+                                var seconds = currentTime.getSeconds(); \
+                                \
+                                hours = (hours < 10 ? '0' : '') + hours; \
+                                minutes = (minutes < 10 ? '0' : '') + minutes; \
+                                seconds = (seconds < 10 ? '0' : '') + seconds; \
+                                \
+                                var timeString = hours + ':' + minutes + ':' + seconds; \
+                                document.getElementById('current-time').value = timeString; \
+                                document.getElementById('update_time').submit(); \
+                            } \
+                            </script> \
+                            </body> \
+                            </html>" 
+              ); 
+            } 
+
+
 void FileWrite() {
-  File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode
+  File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode 
   if (file) {
     file.println(newText); // Write the text to the file
     file.close();
@@ -145,6 +263,7 @@ void FileWrite() {
     server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
   }
 }
+
 
 void handle_post() {
   if (server.hasArg("message")) { // Check if the POST request has the message parameter
@@ -164,15 +283,6 @@ void handle_post() {
   handle_root();
 }
 
-void get_time(){
-  DateTime now = rtc.now();
-  int hora = now.hour();
-  int minuto = now.minute();
-  int segundo = now.second();
-  int milisegundo = (millis() - sec_mill) % 1000;
-  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
-  recalibrar();
-}
 
 void FileRead() {
   if (LittleFS.exists("/text.txt")) {
@@ -187,6 +297,7 @@ void FileRead() {
   }
 }
 
+
 void FileDelete() {
   if (LittleFS.exists("/text.txt")) {
     if (LittleFS.remove("/text.txt")) {
@@ -200,6 +311,7 @@ void FileDelete() {
   text = ""; // Clear the text
   handle_root(); // Display the updated text on the webpage
 }
+
 
 void FileDownload() {
   if (LittleFS.exists("/text.txt")) {
@@ -216,6 +328,19 @@ void FileDownload() {
   }
   handle_root(); // Display the updated text on the webpage
 }
+
+
+void update_time() {
+  if (server.hasArg("current-time")) { // Check if the POST request has the current-time parameter
+    String time = server.arg("current-time");
+    int hour = time.substring(0, 2).toInt();
+    int minute = time.substring(3, 5).toInt();
+    int second = time.substring(6, 8).toInt();
+    rtc.adjust(DateTime(rtc.now().year(), rtc.now().month(), rtc.now().day(), hour, minute, second));
+  }
+  settings(); // Display the updated settings page
+}
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -251,9 +376,20 @@ void setup() {
   server.on("/post", HTTP_POST, handle_post);
   server.on("/delete", HTTP_GET, FileDelete);
   server.on("/download", HTTP_GET, FileDownload);
+  server.on("/settings", HTTP_GET, settings);
+  server.on("/update_time", HTTP_POST, update_time);
+  server.on("/start_finish", HTTP_GET, []() {
+    mode = "Inicio/Fim";
+    handle_root();
+  });
+  server.on("/round_course", HTTP_GET, []() {
+    mode = "Circuito Fechado";
+    handle_root();
+  });
   server.begin(); // Start the server
   FileRead();
 }
+
 
 void loop(){
   dnsS.processNextRequest();  // Handle DNS requests
@@ -274,9 +410,22 @@ void loop(){
   
     if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
       digitalWrite(LED_BUILTIN,HIGH);
-      get_time();
-      interval = 2000;
+      
+      if (mode == "Inicio/Fim"){
+        get_time();
 
+      } else if (mode == "Circuito Fechado"){
+        if (start == 0){
+          start = millis();
+
+        } else {
+          finish = millis();
+          float elapsedTime = (finish - start) / 1000.0;
+          tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
+          start = 0;
+        }
+      }
+      interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
     } else if (analogRead(sensorPin) > sensorValue + 100){ // Se a leitura do sensor for maior que o valor de referencia recalibra
       recalibrar();
     }

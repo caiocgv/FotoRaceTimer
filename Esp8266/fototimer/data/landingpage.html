@@ -12,7 +12,9 @@
 
                                     div {
                                         display: flex;
-                                        justify-content: space-evenly;
+                                        justify-content: space-around;
+                                        text-align: center;
+                                        
                                     }
 
                                     form {
@@ -35,13 +37,15 @@
                                         cursor: pointer;
                                         font-size: large;
                                         border-radius: 5px;
+                                        width: 105px;
+                                        height: 50px;
                                     }
 
                                     button:hover {
                                         opacity: 0.8;
                                     }
                                     table {
-                                        width: 50%;
+                                        width: 80%;
                                         text-align: center;
                                         font-size: x-large;
                                         border-radius: 5px; 
@@ -55,24 +59,16 @@
                                     table tr:nth-child(odd) {
                                         background-color: rgb(76, 76, 76);
                                     }
-                                    h1 {
+                                    h1, h2 {
                                         text-align: center;
                                     }
                                      </style> 
-                                    <title> FotoCelula1 </title>   
+                                    <title> Home </title>   
                                     </head> 
-                                    <body> 
-                                    <h1>Modo de Operação</h1>
-                                    <div>
-                                    <div style="width: 500px;">
-                                        <form action="/start_finish">
-                                            <button type="submit">Início/Fim</button>
-                                        </form>
-                                        <form action="/round_course">
-                                            <button type="submit">Circuito Fechado</button>
-                                        </form>
-                                    </div>
-                                    </div>
+                                    <body>
+                                    <h1> Modo de Uso </h1>
+                                    <h2> {{mode}} </h2>
+                                    
                                     <br><hr><br>
                                     <div>
                                         <form action='/post' method='post'> 
@@ -87,19 +83,19 @@
                                                 <th>ID</th>
                                                 <th>Time</th>
                                             </tr>
-                                            <tr>
-                                                <td>text</td>
-                                                <td>text</td>
-                                            </tr>
+                                            {{text}}
                                         </table>
                                     </div>
                                     <br><hr><br>
-                                    <div>
+                                    <div>                                        
                                         <form action='/delete'> 
                                             <button type='submit'>Limpar Resultados</button> 
                                         </form> 
                                         <form action='/download'> 
                                             <button type='submit'>Salvar Dados</button> 
                                         </form> 
+                                        <form action='/settings'>
+                                            <button type='submit'>Ajustes</button>
+                                        </form>
                                     </div> 
                                    </body> 
