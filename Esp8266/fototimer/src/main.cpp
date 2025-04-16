@@ -353,8 +353,6 @@ void setup() {
     Serial.println("Couldn't find RTC");
     while (1);
   }
-  // setTime();
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
   Serial.begin(9600);
   Wifi.softAP(ssid);               // Set the ESP8266 to Access Point mode
