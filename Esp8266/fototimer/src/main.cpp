@@ -243,13 +243,9 @@ void settings() {
                                 seconds = (seconds < 10 ? '0' : '') + seconds; \
                                 \
                                 var timeString = hours + ':' + minutes + ':' + seconds; \
-                                document.getElementById('current-time').textContent = timeString; \
+                                document.getElementById('current-time').value = timeString; \
                                 document.getElementById('update_time').submit(); \
                             } \
-                            setInterval(function() { \
-                                  location.reload();\
-                              }\
-                              , 1000);\
                             </script> \
                             </body> \
                             </html>" 
@@ -415,16 +411,17 @@ void loop(){
     if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
       digitalWrite(LED_BUILTIN,HIGH);
       
-      if (mode = = "Inicio/Fim"){
+      if (mode == "Inicio/Fim"){
         get_time();
 
       } else if (mode == "Circuito Fechado"){
-        if (start = 0){
+        if (start == 0){
           start = millis();
 
         } else {
           finish = millis();
-          tempo = "<td>" + string((finish - start) / 1000) + "</td></tr>" + text;
+          float elapsedTime = (finish - start) / 1000.0;
+          tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
           start = 0;
         }
       }
