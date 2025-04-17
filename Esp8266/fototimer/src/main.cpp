@@ -9,7 +9,7 @@
 
 RTC_DS1307 rtc;
 
-const char* ssid = "FotoCelula1";  // SSID of your access point
+const char* ssid = "largada";  // SSID of your access point, change name as needed
 const byte DNS_PORT = 53;           // Port for DNS server
 DNSServer dnsS;                     // Create a DNSServer object
 
@@ -321,7 +321,7 @@ void FileDownload() {
   if (LittleFS.exists("/text.txt")) {
     File file = LittleFS.open("/text.txt", "r");
     if (file) {
-      server.sendHeader("Content-Disposition", "attachment; filename=FotoCelula1.txt");
+      server.sendHeader("Content-Disposition", "attachment; filename=" + String(ssid) + ".txt");
       server.streamFile(file, "application/octet-stream");
       file.close();
     } else {
