@@ -71,6 +71,11 @@
         <button type='button' onclick='updateTime()'>Atualizar</button>
     </form>
     <hr>
+    <h1>Configurações</h1>
+    <form action='/range_set' method='post'>
+        <input type='number' id='range' name='range' onchange='submitForm()' placeholder='sensibilidade'>
+    </form>
+    <hr>
     <h1>Modo de uso</h1>
     <div>
         <form action='/start_finish'>

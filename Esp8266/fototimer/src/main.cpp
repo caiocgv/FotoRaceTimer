@@ -18,7 +18,7 @@ ESP8266WiFiClass Wifi;              // Create a Wifi object
 
 String text, newText, tempo, strTime, id, mode = "Inicio/Fim"; // Initialize variables                
 
-int seconds, sensorValue; 
+int seconds, sensorValue, range = 100; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
 
@@ -129,7 +129,7 @@ void handle_root() {
 void recalibrar() {
   sensorValue = 0;
   sensorValue = analogRead(sensorPin);
-  sensorValue = sensorValue - 50;
+  sensorValue = sensorValue - range;
 }
 
 
@@ -171,7 +171,7 @@ void settings() {
                             } \
                     \
                             input { \
-                                width: 100px; \
+                                width: 150px; \
                                 height: 30px; \
                                 font-size: xx-large; \
                                 border-radius: 5px; \
@@ -219,6 +219,11 @@ void settings() {
                           <form action='/update_time' method='post' id='update_time'> \
                               <input type='text' id='current-time' name='current-time' style='display: none;'> \
                               <button type='button' onclick='updateTime()'>Atualizar</button> \
+                          </form> \
+                          <hr> \
+                          <h1>Ajuste de sensibilidade</h1> \
+                          <form action='/range_set' method='post'> \
+                              <input type='number' id='range' name='range' onchange='submitForm()' placeholder='" + range + "'> \
                           </form> \
                           <hr> \
                           <h1>Modo de Uso</h1> \
@@ -388,6 +393,12 @@ void setup() {
     mode = "Circuito Fechado";
     handle_root();
   });
+  server.on("/range_set", HTTP_POST, []() {
+    if (server.hasArg("range")) { // Check if the POST request has the message parameter
+    range = server.arg("range").toInt();    
+    }
+    settings();
+  });
   server.begin(); // Start the server
   FileRead();
 }
@@ -428,7 +439,7 @@ void loop(){
         }
       }
       interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
-    } else if (analogRead(sensorPin) > sensorValue + 100){ // Se a leitura do sensor for maior que o valor de referencia recalibra
+    } else if (analogRead(sensorPin) > sensorValue + range * 2){ // Se a leitura do sensor for maior que o valor de referencia recalibra
       recalibrar();
     }
   }
