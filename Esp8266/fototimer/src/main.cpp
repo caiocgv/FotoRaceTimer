@@ -5,8 +5,6 @@
 #include <LittleFS.h>
 #include <RTClib.h>
 
-#define sensorPin A0
-
 RTC_DS1307 rtc;
 
 const char* ssid = "largada";  // SSID of your access point, change name as needed
@@ -16,11 +14,27 @@ DNSServer dnsS;                     // Create a DNSServer object
 ESP8266WebServer server(80);        // Create a webserver object that listens for HTTP request on port 80
 ESP8266WiFiClass Wifi;              // Create a Wifi object
 
-String text, newText, tempo, strTime, id, mode = "Inicio/Fim"; // Initialize variables                
+String text, newText, tempo, strTime, id, devices, mode = "Inicio/Fim"; // Initialize variables                
 
 int seconds, sensorValue, range = 100; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
+void scan_nearby() { // Function to scan for nearby devices
+  
+  devices = ""; // Clear the devices string
+  start = millis(); // Get the current time in milliseconds
+  int numDevices = WiFi.scanNetworks(false, true, 6); // Scan for networks
+  WiFi.scanComplete(); // Wait for the scan to complete
+  if (numDevices > 0) { // If there are devices found
+    for (int i = 0; i < numDevices; i++) { // Loop through the devices
+      if (WiFi.RSSI(i) < range) { 
+        devices += "<p>" + String(i+1) + ": " + WiFi.SSID(i) + " (" + String(WiFi.RSSI(i)) + ") Channel: " + String(WiFi.channel(i)) + "</p>"; // Get the device information
+      }
+    }
+  }
+  Wifi.scanDelete(); // Delete the scanned networks
+  Serial.println("Scan done in " + String(millis() - start) + "ms"); // Print the time taken to scan
+}
 
 void handle_root() {
   server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
@@ -94,6 +108,10 @@ void handle_root() {
                     <h2>" + mode + "</h2> \
                     <br><hr><br> \
                     <div> \
+                    <h1>Dispositivos proximos</h1> \
+                    " + devices + " \
+                    </div> \
+                    <div> \
                     <form action='/post' method='post'> \
                       <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
                       <input type='number' id='message' height= 20px name='message' onchange='submitForm()'> \
@@ -126,13 +144,6 @@ void handle_root() {
                 }
 
 
-void recalibrar() {
-  sensorValue = 0;
-  sensorValue = analogRead(sensorPin);
-  sensorValue = sensorValue - range;
-}
-
-
 void get_time(){
   DateTime now = rtc.now();
   int hora = now.hour();
@@ -141,7 +152,6 @@ void get_time(){
   int milisegundo = (millis() - sec_mill) % 1000;
   tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
   strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
-  recalibrar();
 }
 
 
@@ -359,25 +369,17 @@ void setup() {
     while (1);
   }
 
-  Serial.begin(9600);
+  Wifi.mode(WIFI_AP_STA); // Set the ESP8266 to HYBRID MODE
+  Serial.begin(115200);
   Wifi.softAP(ssid);               // Set the ESP8266 to Access Point mode
-  Serial.println("Access Point mode enabled at IP: " + WiFi.softAPIP().toString());
 
   dnsS.start(DNS_PORT, "*", WiFi.softAPIP()); // Start the DNS server
 
-  while (WiFi.softAPgetStationNum() == 0) { // Wait for a client to connect to the access point
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
-  }
-
+  
   if (!LittleFS.begin()) { // Initialize LittleFS
     Serial.println("Failed to initialize LittleFS");
     while (1) {} // Stop the program if LittleFS initialization fails
   }
-
-  recalibrar();
 
   server.onNotFound(handle_root); // Handle requests to the root URL
   server.on("/", HTTP_GET, handle_root);
@@ -424,29 +426,7 @@ void loop(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) { // Verifica se o intervalo de leitura foi atingido
     previousMillis = currentMillis;
-    interval = 100;    
+    interval = 5000;    
     digitalWrite(LED_BUILTIN,LOW);
-  
-    if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
-      digitalWrite(LED_BUILTIN,HIGH);
-      
-      if (mode == "Inicio/Fim"){
-        get_time();
-
-      } else if (mode == "Circuito Fechado"){
-        if (start == 0){
-          start = millis();
-
-        } else {
-          finish = millis();
-          float elapsedTime = (finish - start) / 1000.0;
-          tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
-          start = 0;
-        }
-      }
-      interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
-    } else if (analogRead(sensorPin) > sensorValue + range * 2){ // Se a leitura do sensor for maior que o valor de referencia recalibra
-      recalibrar();
-    }
   }
 }
