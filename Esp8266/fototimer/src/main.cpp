@@ -141,6 +141,7 @@ void get_time(){
   int milisegundo = (millis() - sec_mill) % 1000;
   tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
   strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
+  Serial.println(strTime);
   recalibrar();
 }
 
@@ -358,19 +359,26 @@ void setup() {
     Serial.println("Couldn't find RTC");
     while (1);
   }
+  if (!rtc.isrunning()) {
+    Serial.println("RTC is NOT running, setting the time!");
+    rtc.adjust(DateTime(2023, 10, 1, 0, 0, 0)); // Set the RTC to a specific date and time
+  }
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   Wifi.softAP(ssid);               // Set the ESP8266 to Access Point mode
   Serial.println("Access Point mode enabled at IP: " + WiFi.softAPIP().toString());
 
   dnsS.start(DNS_PORT, "*", WiFi.softAPIP()); // Start the DNS server
 
+  Serial.print("Waiting for a client to connect to the access point");
   while (WiFi.softAPgetStationNum() == 0) { // Wait for a client to connect to the access point
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
     digitalWrite(LED_BUILTIN, LOW);
     delay(500);
+    Serial.print(".");
   }
+  Serial.println("Client connected to the access point");
 
   if (!LittleFS.begin()) { // Initialize LittleFS
     Serial.println("Failed to initialize LittleFS");
