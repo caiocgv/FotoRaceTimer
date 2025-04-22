@@ -93,6 +93,8 @@
     </form>
     </div>
     <script>
+        window.addEventListener('load', check_time()); // Call check_time() when the page loads
+        
         function updateTime() {
             const currentTime = new Date();
             var hours = currentTime.getHours();
@@ -109,6 +111,12 @@
             document.getElementById('update_time').submit();
         }
 
+
+        function check_time() { 
+            if (" + strTime.substring(0,8) + " == '00:00:00'){ 
+                updateTime(); 
+            }
+        } 
     </script>
 </body>
 </html>
