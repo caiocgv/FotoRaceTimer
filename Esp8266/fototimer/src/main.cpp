@@ -409,6 +409,11 @@ void loop(){
   dnsS.processNextRequest();  // Handle DNS requests
   server.handleClient();      // Handle client requests
 
+  // check for stable wifi connection
+  if (WiFi.softAPgetStationNum() == 0){
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
+
   // emulate milliseconds on RTC module
   if (seconds != rtc.now().second()){
     seconds = rtc.now().second();
