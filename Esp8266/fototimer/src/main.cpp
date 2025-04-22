@@ -23,11 +23,6 @@ unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initia
 
 
 void handle_root() {
-  get_time(); // Get the current time from the RTC module
-  if (strTime.substring(0,8) == "00:00:00"){
-    settings(); // If the RTC is not set, display the settings page
-    return;
-  }
   server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
                    " <!DOCTYPE html> \
                    <html> \
@@ -247,7 +242,6 @@ void settings() {
                             <button type='submit'>Voltar</button> \
                           </form> \
                           <script> \
-                            window.addEventListener('load', check_time()); // Call check_time() when the page loads \
                             function updateTime() { \
                                 const currentTime = new Date(); \
                                 var hours = currentTime.getHours(); \
@@ -261,11 +255,6 @@ void settings() {
                                 var timeString = hours + ':' + minutes + ':' + seconds; \
                                 document.getElementById('current-time').value = timeString; \
                                 document.getElementById('update_time').submit(); \
-                            } \
-                            function check_time() { \
-                              if (" + strTime.substring(0,8) + " == '00:00:00'){ \
-                                  updateTime(); \
-                              } \
                             } \
                             </script> \
                             </body> \
