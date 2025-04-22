@@ -379,6 +379,7 @@ void setup() {
 
   recalibrar();
 
+  server.onNotFound(handle_root); // Handle requests to the root URL
   server.on("/", HTTP_GET, handle_root);
   server.on("/post", HTTP_POST, handle_post);
   server.on("/delete", HTTP_GET, FileDelete);
