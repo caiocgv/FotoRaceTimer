@@ -23,107 +23,17 @@ unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initia
 
 
 void handle_root() {
-  server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
-                   " <!DOCTYPE html> \
-                   <html> \
-                   <head> \
-                   <meta name='viewport' content='width=device-width, initial-scale=1'> \
-                   <style> \
-                  body { \
-                    font-family: Arial; \
-                    margin-left: 20px; \
-                    background-color: rgb(48, 46, 46); \
-                    color: aliceblue; \
-                  } \
- \
-                  div { \
-                    display: flex; \
-                    justify-content: space-evenly; \
-                  } \
- \
-                  form { \
-                    display: inline-block; \
-                  } \
- \
-                  input { \
-                    width: 100px; \
-                    height: 30px; \
-                    font-size: xx-large; \
-                    border-radius: 5px; \
-                  } \
- \
-                  button { \
-                    background-color: gray; \
-                    color: aliceblue; \
-                    padding: 4px 8px; \
-                    margin: 8px 0; \
-                    border: none; \
-                    cursor: pointer; \
-                    font-size: large; \
-                    border-radius: 5px; \
-                    width: 105px; \
-                    height: 50px; \
-                  } \
- \
-                  button:hover { \
-                    opacity: 0.8; \
-                  } \
-                  table { \
-                    width: 80%; \
-                    text-align: center; \
-                    font-size: x-large; \
-                    border-radius: 5px;  \
-                  } \
- \
-                  table tr:nth-child(even) { \
-                    background-color: lightgray; \
-                    color: black; \
-                  } \
- \
-                  table tr:nth-child(odd) { \
-                    background-color: rgb(76, 76, 76); \
-                  } \
-                    h1, h2 { \
-                    text-align: center; \
-                    } \
-                     </style> \
-                    <title> Home </title>   \
-                    </head> \
-                    <body> \
-                    <h1> Modo de Uso </h1> \
-                    <h2>" + mode + "</h2> \
-                    <br><hr><br> \
-                    <div> \
-                    <form action='/post' method='post'> \
-                      <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> \
-                      <input type='number' id='message' height= 20px name='message' onchange='submitForm()'> \
-                    </form> \
-                    </div> \
-                    <br><hr><br> \
-                    <div> \
-                    <table> \
-                      <tr> \
-                      <th>ID</th> \
-                      <th>Time</th> \
-                      </tr> \
-                      " + text + " \
-                    </table> \
-                    </div> \
-                    <br><hr><br> \
-                    <div> \
-                    <form action='/delete'> \
-                      <button type='submit'>Limpar Resultados</button> \
-                    </form> \
-                    <form action='/download'> \
-                      <button type='submit'>Salvar Dados</button> \
-                    </form> \
-                    <form action='/settings'> \
-                      <button type='submit'>Ajustes</button> \
-                    </form> \
-                    </div> \
-                     </body> \
-                    ");
-                }
+  File file = LittleFS.open("/landingpage.html", "r");
+  if (file) {
+    String root = file.readString();
+    root.replace("{{text}}", text); // Replace the placeholder with the text from the file
+    root.replace("{{mode}}", mode); // Replace the placeholder with the mode
+    file.close();    
+    server.send(200, "text/html", root);
+  } else {
+    server.send(500, "text/plain", "Failed to open file for reading");
+  }
+}
 
 
 void recalibrar() {
@@ -147,119 +57,17 @@ void get_time(){
 
 void settings() {
   get_time(); // Get the current time from the RTC module
-  server.send(200, "text/html",                     // Send HTTP status 200 (Ok) and the content type of the response
-                     "<!DOCTYPE html> \
-                        <html> \
-                        <head> \
-                          <title>Settings</title> \
-                          <style> \
-                            body { \
-                                font-family: Arial; \
-                                margin-left: 20px; \
-                                background-color: rgb(48, 46, 46); \
-                                color: aliceblue; \
-                                text-align: center; \
-                            } \
-                    \
-                            div { \
-                                display: flex; \
-                                justify-content: space-evenly; \
-                            } \
-                    \
-                            form { \
-                                display: inline-block; \
-                            } \
-                    \
-                            input { \
-                                width: 150px; \
-                                height: 30px; \
-                                font-size: xx-large; \
-                                border-radius: 5px; \
-                            } \
-                    \
-                            button { \
-                                background-color: gray; \
-                                color: aliceblue; \
-                                padding: 4px 8px; \
-                                margin: 8px 0; \
-                                border: none; \
-                                cursor: pointer; \
-                                font-size: large; \
-                                border-radius: 5px; \
-                                width: 105px; \
-                                height: 50px; \
-                            } \
-                    \
-                            button:hover { \
-                                opacity: 0.8; \
-                            } \
-                            table { \
-                                width: 80%; \
-                                text-align: center; \
-                                font-size: x-large; \
-                                border-radius: 5px;  \
-                            } \
-                    \
-                            table tr:nth-child(even) { \
-                                background-color: lightgray; \
-                                color: black; \
-                            } \
-                    \
-                            table tr:nth-child(odd) { \
-                                background-color: rgb(76, 76, 76); \
-                            } \
-                            h1 { \
-                                text-align: center; \
-                            } \
-                          </style> \
-                        </head> \
-                        <body> \
-                          <h1>Relogio da Fotocelula</h1> \
-                          <h2>"+ strTime + "</h2> \
-                          <form action='/update_time' method='post' id='update_time'> \
-                              <input type='text' id='current-time' name='current-time' style='display: none;'> \
-                              <button type='button' onclick='updateTime()'>Atualizar</button> \
-                          </form> \
-                          <hr> \
-                          <h1>Ajuste de sensibilidade</h1> \
-                          <form action='/range_set' method='post'> \
-                              <input type='number' id='range' name='range' onchange='submitForm()' placeholder='" + range + "'> \
-                          </form> \
-                          <hr> \
-                          <h1>Modo de Uso</h1> \
-                          <div> \
-                            <form action='/start_finish'> \
-                              <button type='submit'>Inicio/Fim</button> \
-                            </form> \
-                            <form action='/round_course'> \
-                              <button type='submit'>Circuito Fechado</button> \
-                            </form> \
-                          </div> \
-                        \
-                          <br><hr><br> \
-                          <form action='/'> \
-                            <button type='submit'>Voltar</button> \
-                          </form> \
-                          <script> \
-                            function updateTime() { \
-                                const currentTime = new Date(); \
-                                var hours = currentTime.getHours(); \
-                                var minutes = currentTime.getMinutes(); \
-                                var seconds = currentTime.getSeconds(); \
-                                \
-                                hours = (hours < 10 ? '0' : '') + hours; \
-                                minutes = (minutes < 10 ? '0' : '') + minutes; \
-                                seconds = (seconds < 10 ? '0' : '') + seconds; \
-                                \
-                                var timeString = hours + ':' + minutes + ':' + seconds; \
-                                document.getElementById('current-time').value = timeString; \
-                                document.getElementById('update_time').submit(); \
-                            } \
-                            </script> \
-                            </body> \
-                            </html>" 
-              ); 
-            } 
+  File file = LittleFS.open("/settings_page.html", "r"); // Open the settings HTML file
+  if (file) {
+    String settings = file.readString(); // Read the content of the file
+    file.close(); // Close the file
+    settings.replace("{{tempo}}", strTime); // Replace the placeholder with the current time
+    settings.replace("{{range}}", String(range)); // Replace the placeholder with the range value
+    server.send(200, "text/html", settings); // Send the settings page to the client
+  } else {
+    server.send(500, "text/plain", "Failed to open file for reading"); // Send HTTP status 500 (Internal server error) and the content type of the response
+  }
+}
 
 
 void FileWrite() {
@@ -379,6 +187,7 @@ void setup() {
 
   recalibrar();
 
+  server.serveStatic("/style.css", LittleFS, "/style.css"); // Serve the CSS file
   server.onNotFound(handle_root); // Handle requests to the root URL
   server.on("/", HTTP_GET, handle_root);
   server.on("/post", HTTP_POST, handle_post);
