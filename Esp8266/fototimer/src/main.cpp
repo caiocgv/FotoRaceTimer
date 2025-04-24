@@ -23,6 +23,18 @@ String reset_button = "<form action='/restart'> \
 int seconds, sensorValue, range = 100; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
+
+void get_time(){
+  DateTime now = rtc.now();
+  int hora = now.hour();
+  int minuto = now.minute();
+  int segundo = now.second();
+  int milisegundo = (millis() - sec_mill) % 1000;
+  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
+  strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
+}
+
+
 void scan_nearby() { // Function to scan for nearby devices
   
   devices = ""; // Clear the devices string
@@ -32,7 +44,9 @@ void scan_nearby() { // Function to scan for nearby devices
   if (numDevices > 0) { // If there are devices found
     for (int i = 0; i < numDevices; i++) { // Loop through the devices
       if (WiFi.RSSI(i) < range) { 
-        devices += "<p>" + String(i+1) + ": " + WiFi.SSID(i) + " (" + String(WiFi.RSSI(i)) + ") Channel: " + String(WiFi.channel(i)) + "</p>"; // Get the device information
+        devices = "<tr><td>" + String(i+1) + ": " + WiFi.SSID(i) + " (" + String(WiFi.RSSI(i)) + ") Channel: " + String(WiFi.channel(i)) + "</td>"; // Get the device information
+        get_time(); // Get the current time
+        devices += tempo; // Append the time to the device information
       }
     }
   }
@@ -44,7 +58,7 @@ void handle_root() {
   File file = LittleFS.open("/landingpage.html", "r");
   if (file) {
     String root = file.readString();
-    root.replace("{{text}}", text); // Replace the placeholder with the text from the file
+    root.replace("{{text}}", devices); // Replace the placeholder with the text from the file
     root.replace("{{mode}}", mode); // Replace the placeholder with the mode
     
     if (mode == "Inicio/Fim") {
@@ -58,17 +72,6 @@ void handle_root() {
   } else {
     server.send(500, "text/plain", "Failed to open file for reading");
   }
-}
-
-
-void get_time(){
-  DateTime now = rtc.now();
-  int hora = now.hour();
-  int minuto = now.minute();
-  int segundo = now.second();
-  int milisegundo = (millis() - sec_mill) % 1000;
-  tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
-  strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
 }
 
 
