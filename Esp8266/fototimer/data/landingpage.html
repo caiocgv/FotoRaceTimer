@@ -1,101 +1,41 @@
- <!DOCTYPE html> 
-                                   <html> 
-                                   <head> 
-                                     <meta name='viewport' content='width=device-width, initial-scale=1'> 
-                                     <style> 
-                                    body {
-                                        font-family: Arial;
-                                        margin-left: 20px;
-                                        background-color: rgb(48, 46, 46);
-                                        color: aliceblue;
-                                    }
-
-                                    div {
-                                        display: flex;
-                                        justify-content: space-around;
-                                        text-align: center;
-                                        
-                                    }
-
-                                    form {
-                                        display: inline-block;
-                                    }
-
-                                    input {
-                                        width: 100px;
-                                        height: 30px;
-                                        font-size: xx-large;
-                                        border-radius: 5px;
-                                    }
-
-                                    button {
-                                        background-color: gray;
-                                        color: aliceblue;
-                                        padding: 4px 8px;
-                                        margin: 8px 0;
-                                        border: none;
-                                        cursor: pointer;
-                                        font-size: large;
-                                        border-radius: 5px;
-                                        width: 105px;
-                                        height: 50px;
-                                    }
-
-                                    button:hover {
-                                        opacity: 0.8;
-                                    }
-                                    table {
-                                        width: 80%;
-                                        text-align: center;
-                                        font-size: x-large;
-                                        border-radius: 5px; 
-                                    }
-
-                                    table tr:nth-child(even) {
-                                        background-color: lightgray;
-                                        color: black;
-                                    }
-
-                                    table tr:nth-child(odd) {
-                                        background-color: rgb(76, 76, 76);
-                                    }
-                                    h1, h2 {
-                                        text-align: center;
-                                    }
-                                     </style> 
-                                    <title> Home </title>   
-                                    </head> 
-                                    <body>
-                                    <h1> Modo de Uso </h1>
-                                    <h2> {{mode}} </h2>
-                                    
-                                    <br><hr><br>
-                                    <div>
-                                        <form action='/post' method='post'> 
-                                            <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> 
-                                            <input type='number' id='message' height= 20px name='message' onchange='submitForm()'>                                       
-                                        </form> 
-                                    </div>
-                                    <br><hr><br>
-                                    <div>
-                                        <table>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Time</th>
-                                            </tr>
-                                            {{text}}
-                                        </table>
-                                    </div>
-                                    <br><hr><br>
-                                    <div>                                        
-                                        <form action='/delete'> 
-                                            <button type='submit'>Limpar Resultados</button> 
-                                        </form> 
-                                        <form action='/download'> 
-                                            <button type='submit'>Salvar Dados</button> 
-                                        </form> 
-                                        <form action='/settings'>
-                                            <button type='submit'>Ajustes</button>
-                                        </form>
-                                    </div> 
-                                   </body> 
+<!DOCTYPE html> 
+<html> 
+    <head> 
+        <meta name='viewport' content='width=device-width, initial-scale=1'> 
+        <title> Home </title>
+        <link rel="stylesheet" href="/style.css">
+    </head> 
+    <body>
+        <h1> Modo de Uso </h1>
+        <h2> {{mode}} </h2>
+        <br><hr><br>
+        <div>
+            <form action='/post' method='post'> 
+                <label for='numberInput' style='font-size: xx-large'>Digite ID: </label> 
+                <input type='number' id='message' height= 20px name='message' onchange='submitForm()'>                                       
+            </form> 
+        </div>
+        <br><hr><br>
+        <div> {{reset_button}} </div>    
+        <div>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                </tr>
+                    {{text}}
+            </table>
+        </div>
+        <br><hr><br>
+        <div>                                        
+            <form action='/delete'> 
+                <button type='submit'>Limpar Resultados</button> 
+            </form> 
+            <form action='/download'> 
+                <button type='submit'>Salvar Dados</button> 
+            </form> 
+            <form action='/settings'>
+                <button type='submit'>Ajustes</button>
+            </form>
+        </div> 
+    </body> 
