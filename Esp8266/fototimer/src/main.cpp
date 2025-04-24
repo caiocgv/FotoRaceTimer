@@ -97,14 +97,19 @@ void handle_post() {
   if (server.hasArg("message")) { // Check if the POST request has the message parameter
     id = server.arg("message");
   }
+  
+  // Check if the mode is "Circuito Fechado" and both start and finish times are set
+  if (mode == "Circuito Fechado" && start != 0 && finish != 0) { 
+    float elapsedTime = (finish - start) / 1000.0;
+    tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
+    start = 0;
+  }
 
-  if (tempo != "" && id != "") { // Check if the text is not empty
-
+  if (tempo != "" && id != "") { // Check if the text is not empty      
     newText = "<tr><td>" + id + "</td>" + tempo;
     text = newText;
     tempo = "";
     id = "";
-
     FileWrite(); // Write the text to permanent memory
   }
   
@@ -260,14 +265,11 @@ void loop(){
         get_time();
 
       } else if (mode == "Circuito Fechado"){
+        
         if (start == 0){
           start = millis();
-
         } else {
-          finish = millis();
-          float elapsedTime = (finish - start) / 1000.0;
-          tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
-          start = 0;
+          finish = millis();          
         }
       }
       interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
