@@ -256,8 +256,9 @@ void loop(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) { // Verifica se o intervalo de leitura foi atingido
     previousMillis = currentMillis;
-    interval = 5000;    
+    interval = 100;    
     digitalWrite(LED_BUILTIN,LOW);
+    scan_nearby(); // Call the function to scan for nearby devices
     
   }
 }
