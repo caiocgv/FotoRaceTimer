@@ -18,6 +18,10 @@ ESP8266WiFiClass Wifi;              // Create a Wifi object
 
 String text, newText, tempo, strTime, id, mode = "Inicio/Fim"; // Initialize variables                
 
+String reset_button = "<form action='/restart'> \
+                        <button type='submit' style='width: 150px;'>Reiniciar Contagem Atual</button> \
+                      </form>";
+
 int seconds, sensorValue, range = 100; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
@@ -28,6 +32,13 @@ void handle_root() {
     String root = file.readString();
     root.replace("{{text}}", text); // Replace the placeholder with the text from the file
     root.replace("{{mode}}", mode); // Replace the placeholder with the mode
+    
+    if (mode == "Inicio/Fim") {
+      root.replace("{{reset_button}}", "");
+    } else {
+      root.replace("{{reset_button}}", reset_button);
+    }
+
     file.close();    
     server.send(200, "text/html", root);
   } else {
@@ -86,14 +97,19 @@ void handle_post() {
   if (server.hasArg("message")) { // Check if the POST request has the message parameter
     id = server.arg("message");
   }
+  
+  // Check if the mode is "Circuito Fechado" and both start and finish times are set
+  if (mode == "Circuito Fechado" && start != 0 && finish != 0) { 
+    float elapsedTime = (finish - start) / 1000.0;
+    tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
+    start = 0;
+  }
 
-  if (tempo != "" && id != "") { // Check if the text is not empty
-
+  if (tempo != "" && id != "") { // Check if the text is not empty      
     newText = "<tr><td>" + id + "</td>" + tempo;
     text = newText;
     tempo = "";
     id = "";
-
     FileWrite(); // Write the text to permanent memory
   }
   
@@ -201,6 +217,7 @@ void setup() {
   });
   server.on("/round_course", HTTP_GET, []() {
     mode = "Circuito Fechado";
+    tempo = "";
     handle_root();
   });
   server.on("/range_set", HTTP_POST, []() {
@@ -208,6 +225,11 @@ void setup() {
     range = server.arg("range").toInt();    
     }
     settings();
+  });
+  server.on("/restart", HTTP_GET, []() {
+    start = 0; // Restart the ESP8266
+    tempo = "";
+    handle_root();
   });
   server.begin(); // Start the server
   FileRead();
@@ -243,14 +265,11 @@ void loop(){
         get_time();
 
       } else if (mode == "Circuito Fechado"){
+        
         if (start == 0){
           start = millis();
-
         } else {
-          finish = millis();
-          float elapsedTime = (finish - start) / 1000.0;
-          tempo = "<td>" + String(elapsedTime, 3) + "s</td></tr>" + text;
-          start = 0;
+          finish = millis();          
         }
       }
       interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
