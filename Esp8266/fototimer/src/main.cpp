@@ -20,8 +20,20 @@ String reset_button = "<form action='/restart'> \
                         <button type='submit' style='width: 150px;'>Reiniciar Contagem Atual</button> \
                       </form>";
 
-int seconds, sensorValue, range = 100, channel = 6; 
+int seconds, sensorValue, range = 30, channel = 6; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
+
+
+void FileWrite() {
+  File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode 
+  if (file) {
+    file.println(newText); // Write the text to the file
+    file.close();
+    newText = "";
+  } else {
+    server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
+  }
+}
 
 
 void get_time(){
@@ -36,23 +48,27 @@ void get_time(){
 
 
 void scan_nearby() { // Function to scan for nearby devices
-  
-  devices = ""; // Clear the devices string
-  start = millis(); // Get the current time in milliseconds
+
   int numDevices = WiFi.scanNetworks(false, true, channel); // Scan for networks
   WiFi.scanComplete(); // Wait for the scan to complete
   if (numDevices > 0) { // If there are devices found
     for (int i = 0; i < numDevices; i++) { // Loop through the devices
-      if (WiFi.RSSI(i) < range) { 
-        devices = "<tr><td>" + String(i+1) + ": " + WiFi.SSID(i) + " (" + String(WiFi.RSSI(i)) + ") Channel: " + String(WiFi.channel(i)) + "</td>"; // Get the device information
+      int rssi = WiFi.RSSI(i); // Get the RSSI value of the device
+      if (rssi > range*-1) { 
+        newText = "<tr><td>" + String(i+1) + ": " + WiFi.SSID(i) + " (" + String(WiFi.RSSI(i)) + ") Channel: " + String(WiFi.channel(i)) + "</td>"; // Get the device information
         get_time(); // Get the current time
-        devices += tempo; // Append the time to the device information
+        newText += tempo; // Append the time to the device information
+        
+        text = newText; // Update the text with the new device information
+        FileWrite(); // Write the text to permanent memory
+
+        interval = 2000; // Set the interval for the next scan
       }
     }
   }
   Wifi.scanDelete(); // Delete the scanned networks
-  Serial.println("Scan done in " + String(millis() - start) + "ms"); // Print the time taken to scan
 }
+
 
 void scan_all() { // Function to scan for all devices
   devices = ""; // Clear the devices string
@@ -70,7 +86,7 @@ void handle_root() {
   File file = LittleFS.open("/landingpage.html", "r");
   if (file) {
     String root = file.readString();
-    root.replace("{{text}}", devices); // Replace the placeholder with the text from the file
+    root.replace("{{text}}", text); // Replace the placeholder with the text from the file
     root.replace("{{mode}}", mode); // Replace the placeholder with the mode
     
     if (mode == "Inicio/Fim") {
@@ -101,18 +117,6 @@ void settings() {
     server.send(200, "text/html", settings); // Send the settings page to the client
   } else {
     server.send(500, "text/plain", "Failed to open file for reading"); // Send HTTP status 500 (Internal server error) and the content type of the response
-  }
-}
-
-
-void FileWrite() {
-  File file = LittleFS.open("/text.txt", "w"); // Open the file in write mode 
-  if (file) {
-    file.println(newText); // Write the text to the file
-    file.close();
-    newText = "";
-  } else {
-    server.send(500, "text/plain", "Failed to open file for writing"); // Send HTTP status 500 (Internal server error) and the content type of the response
   }
 }
 
@@ -217,6 +221,15 @@ void setup() {
   if (!LittleFS.begin()) { // Initialize LittleFS
     Serial.println("Failed to initialize LittleFS");
     while (1) {} // Stop the program if LittleFS initialization fails
+  }
+
+  Serial.print("Waiting Client connection..."); // Print message to the serial monitor
+  while (Wifi.softAPgetStationNum() == 0) { // Wait for a client to connect
+    delay(500);
+    digitalWrite(LED_BUILTIN, LOW); // Turn on the LED when waiting for a client
+    Serial.print(".");
+    delay(500);
+    digitalWrite(LED_BUILTIN, HIGH); // Turn off the LED when a client is connected
   }
 
   server.serveStatic("/style.css", LittleFS, "/style.css"); // Serve the CSS file
