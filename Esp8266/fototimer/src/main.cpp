@@ -20,7 +20,7 @@ String reset_button = "<form action='/restart'> \
                         <button type='submit' style='width: 150px;'>Reiniciar Contagem Atual</button> \
                       </form>";
 
-int seconds, sensorValue, range = 100; 
+int seconds, sensorValue, range = 100, channel = 6; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
 
 
@@ -39,7 +39,7 @@ void scan_nearby() { // Function to scan for nearby devices
   
   devices = ""; // Clear the devices string
   start = millis(); // Get the current time in milliseconds
-  int numDevices = WiFi.scanNetworks(false, true, 6); // Scan for networks
+  int numDevices = WiFi.scanNetworks(false, true, channel); // Scan for networks
   WiFi.scanComplete(); // Wait for the scan to complete
   if (numDevices > 0) { // If there are devices found
     for (int i = 0; i < numDevices; i++) { // Loop through the devices
@@ -53,6 +53,18 @@ void scan_nearby() { // Function to scan for nearby devices
   Wifi.scanDelete(); // Delete the scanned networks
   Serial.println("Scan done in " + String(millis() - start) + "ms"); // Print the time taken to scan
 }
+
+void scan_all() { // Function to scan for all devices
+  devices = ""; // Clear the devices string
+  int numDevices = WiFi.scanNetworks(false, true); // Scan for networks on all channels
+  WiFi.scanComplete(); // Wait for the scan to complete
+  if (numDevices > 0) { // If there are devices found
+    for (int i = 0; i < numDevices; i++) { // Loop through the devices
+      devices += "<tr><td>" + String(WiFi.SSID(i)) + "</td><td>" + String(WiFi.RSSI(i)) + "</td><td>" + String(WiFi.channel(i)) + "</td></tr>"; // Get the device information
+    }
+  }
+}
+
 
 void handle_root() {
   File file = LittleFS.open("/landingpage.html", "r");
@@ -77,12 +89,15 @@ void handle_root() {
 
 void settings() {
   get_time(); // Get the current time from the RTC module
+  scan_all(); // Scan for all devices
   File file = LittleFS.open("/settings_page.html", "r"); // Open the settings HTML file
   if (file) {
     String settings = file.readString(); // Read the content of the file
     file.close(); // Close the file
     settings.replace("{{tempo}}", strTime); // Replace the placeholder with the current time
     settings.replace("{{range}}", String(range)); // Replace the placeholder with the range value
+    settings.replace("{{channel}}", String(channel)); // Replace the placeholder with the channel value
+    settings.replace("{{devices}}", devices); // Replace the placeholder with the scanned devices
     server.send(200, "text/html", settings); // Send the settings page to the client
   } else {
     server.send(500, "text/plain", "Failed to open file for reading"); // Send HTTP status 500 (Internal server error) and the content type of the response
@@ -231,6 +246,12 @@ void setup() {
     start = 0; // Restart the ESP8266
     tempo = "";
     handle_root();
+  });
+  server.on("/channel_set", HTTP_POST, []() {
+    if (server.hasArg("channel")) { // Check if the POST request has the message parameter
+      channel = server.arg("channel").toInt();
+    }
+    settings();
   });
   server.begin(); // Start the server
   FileRead();

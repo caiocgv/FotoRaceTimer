@@ -5,6 +5,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="\style.css">
 </head>
+<style></style>
 <body>
     <h1>Relogio da Fotocelula</h1>
     <h2>{{tempo}}</h2>   
@@ -15,11 +16,37 @@
         </form>
     </div>     
     <hr>
-    <h1>Ajuste de sensibilidade</h1>
+    <h1>Ajustes</h1>
     <div>
-        <form action='/range_set' method='post'>
-            <input type='number' id='range' name='range' onchange='submitForm()' placeholder='{{range}}'>
-        </form>
+        <table>
+            <tr>
+                <th>Sensibilidade</th>
+                <th>Canal</th>
+            </tr>
+            <tr>
+                <td>
+                    <form action='/range_set' method='post'>
+                        <input type='number' id='range' name='range' onchange='submitForm()' placeholder='{{range}}'>
+                    </form>
+                </td>
+                <td>
+                    <form action="/channel_set" method="post">
+                        <input type="number" id="channel" name="channel" onchange='submitForm()' placeholder='{{channel}}'>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <h1>Dispositivos próximos</h1>
+    <div>
+    <table>
+        <tr>
+            <th>SSID</th>
+            <th>RSSI</th>
+            <th>Canal</th>
+        </tr>
+        {{devices}}
+    </table>
     </div>
     <hr>
     <h1>Modo de uso</h1>
