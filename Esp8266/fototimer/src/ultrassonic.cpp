@@ -1,4 +1,5 @@
 // Include the Ultrasonic library
+#include <Arduino.h>
 #include <HCSR04.h>
 
 // Define the pins for the ultrasonic sensor
@@ -12,6 +13,10 @@ UltraSonicDistanceSensor ultrasonic(trigPin, echoPin, maxdistance, 30000); // Se
 void setup() {
     // Initialize the serial communication
     Serial.begin(115200);
+    Serial.println("Ultrasonic Sensor Test");
+
+    // Set the LED pin as an output
+    pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -24,5 +29,8 @@ void loop() {
     Serial.println(" cm");
 
     // Delay for a short period of time
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
 }
