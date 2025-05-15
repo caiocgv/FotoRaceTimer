@@ -5,8 +5,6 @@
 #include <LittleFS.h>
 #include <RTClib.h>
 
-#define sensorPin A0
-
 RTC_DS1307 rtc;
 
 const char* ssid = "largada";  // SSID of your access point, change name as needed
@@ -22,8 +20,35 @@ String reset_button = "<form action='/restart'> \
                         <button type='submit' style='width: 150px;'>Reiniciar Contagem Atual</button> \
                       </form>";
 
-int seconds, sensorValue, range = 100; 
+int seconds, sensorValue, range = 2; 
 unsigned long sec_mill, previousMillis, interval = 100, start, finish; // Initialize variables for timing and sensor reading
+
+
+// Define the pins for the ultrasonic sensor
+const int trigPin = 14; // GPIO 14 (D5 on NodeMCU)
+const int echoPin = 12; // GPIO 12 (D6 on NodeMCU)
+
+float ultrasonic() {
+    // Set the trigger pin as an output
+    pinMode(trigPin, OUTPUT);
+    // Set the echo pin as an input
+    pinMode(echoPin, INPUT);
+
+    // Send a 10 microsecond pulse to the trigger pin
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    // Measure the time it takes for the echo to return
+    long duration = pulseIn(echoPin, HIGH, 30000);
+
+    // Calculate the distance in centimeters
+    float distance = (duration / 2.0) * 0.0343;
+
+    return distance;
+}
 
 
 void handle_root() {
@@ -49,7 +74,7 @@ void handle_root() {
 
 void recalibrar() {
   sensorValue = 0;
-  sensorValue = analogRead(sensorPin);
+  sensorValue = ultrasonic(); // Get the distance from the ultrasonic sensor
   sensorValue = sensorValue - range;
 }
 
@@ -62,7 +87,6 @@ void get_time(){
   int milisegundo = (millis() - sec_mill) % 1000;
   tempo = "<td>" + String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo) + "</td></tr>" + text;
   strTime = String(hora) + ":" + String(minuto) + ":" + String(segundo) + ":" + String(milisegundo);
-  recalibrar();
 }
 
 
@@ -258,7 +282,7 @@ void loop(){
     interval = 100;    
     digitalWrite(LED_BUILTIN,LOW);
   
-    if (analogRead(sensorPin) < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
+    if (ultrasonic() < sensorValue){ // Se a leitura do sensor for menor que o valor de referencia registra o tempo
       digitalWrite(LED_BUILTIN,HIGH);
       
       if (mode == "Inicio/Fim"){
@@ -273,7 +297,8 @@ void loop(){
         }
       }
       interval = 2000; // Aumenta o intervalo de leitura para evitar múltiplas leituras
-    } else if (analogRead(sensorPin) > sensorValue + range * 2){ // Se a leitura do sensor for maior que o valor de referencia recalibra
+      recalibrar(); // Recalibra o sensor
+    } else if (ultrasonic() > sensorValue + range * 2){ // Se a leitura do sensor for maior que o valor de referencia recalibra
       recalibrar();
     }
   }
