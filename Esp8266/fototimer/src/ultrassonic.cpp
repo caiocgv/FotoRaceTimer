@@ -5,7 +5,8 @@
 const int trigPin = 14; // GPIO 14 (D5 on NodeMCU)
 const int echoPin = 12; // GPIO 12 (D6 on NodeMCU)
 
-int sensorValue = 0, range = 2; // Default range in cm
+float sensorValue = 0, range = 2; // Default range in cm
+
 
 float ultrasonic() {
     // Set the trigger pin as an output
@@ -21,7 +22,7 @@ float ultrasonic() {
     digitalWrite(trigPin, LOW);
 
     // Measure the time it takes for the echo to return
-    long duration = pulseIn(echoPin, HIGH, 30000);
+    long duration = pulseIn(echoPin, HIGH, 50000);
 
     // Calculate the distance in centimeters
     float distance = (duration / 2.0) * 0.0343;
@@ -31,10 +32,8 @@ float ultrasonic() {
 
 
 void recalibrar() {
-  sensorValue = 0;
+  
   sensorValue = ultrasonic(); // Get the distance from the ultrasonic sensor
-  sensorValue = sensorValue;
-
   pinMode(LED_BUILTIN, OUTPUT);
     for (int i = 0; i < 3; i++) {
         digitalWrite(LED_BUILTIN, HIGH);
@@ -42,6 +41,8 @@ void recalibrar() {
         digitalWrite(LED_BUILTIN, LOW);
         delay(200);
     }
+    Serial.print("Recalibrating... New sensor value: ");
+    Serial.println(sensorValue);
 }
 
 void setup() {
@@ -72,7 +73,20 @@ void loop() {
         // Add your action here, e.g., turn on a relay or send a notification
         recalibrar(); // Call the recalibrar function to update the sensor value
     } else if (distance > sensorValue + range) {
-        recalibrar(); // Call the recalibrar function to update the sensor value
+        sensorValue = distance; // Update the sensor value
+        
+        for (int i = 0; i < 3; i++) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(200);
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(200);
+        }
+        Serial.print("Recalibrating... New sensor value: ");
+        Serial.println(sensorValue);
+        
+    } else {
+        digitalWrite(LED_BUILTIN, LOW);
         delay(100);
+
     }
 }
