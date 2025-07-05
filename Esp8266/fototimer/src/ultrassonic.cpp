@@ -5,7 +5,7 @@
 const int trigPin = 14; // GPIO 14 (D5 on NodeMCU)
 const int echoPin = 12; // GPIO 12 (D6 on NodeMCU)
 
-float sensorValue = 0, range = 2; // Default range in cm
+float sensorValue = 0, range = 10; // Default range in cm
 
 
 float ultrasonic() {
@@ -33,16 +33,18 @@ float ultrasonic() {
 
 void recalibrar() {
   
-  sensorValue = ultrasonic(); // Get the distance from the ultrasonic sensor
+  sensorValue = 0;
   pinMode(LED_BUILTIN, OUTPUT);
     for (int i = 0; i < 3; i++) {
         digitalWrite(LED_BUILTIN, HIGH);
         delay(200);
         digitalWrite(LED_BUILTIN, LOW);
         delay(200);
+        sensorValue = sensorValue + ultrasonic(); // Get the distance from the ultrasonic sensor
     }
     Serial.print("Recalibrating... New sensor value: ");
-    Serial.println(sensorValue);
+    Serial.println(sensorValue/3);
+    sensorValue = sensorValue / 3; // Average the sensor value over 3 readings
 }
 
 void setup() {
